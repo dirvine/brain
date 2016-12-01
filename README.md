@@ -1,1 +1,1 @@
-# NEAT2 - An experimental playground for Neuro Evolution 
+# An experimental playground for Neuro Evolution 
