@@ -16,3 +16,26 @@ extern crate rand;
 extern crate rulinalg;
 extern crate num_cpus;
 extern crate crossbeam;
+
+// Cerebrum -> Large superior region of brain
+// consists of
+// frontal lobe
+// temporal lobe
+// pariental lobe
+// occipital lobe
+//
+// Function of some of the sub-divisions / regions
+//
+// Movement
+// Sensory processing (visual hearing smell touch taste)
+// Olfacation - smell (large part of cortex)
+// Language and communication
+// Learning and memory
+//
+// inputs are nerves
+//
+// Neuron includes Genomes
+//
+// axon links neurons and synapses connect them (firing signals)
+//
+// axons also link lobes (cortex) (species) together.
