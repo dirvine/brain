@@ -17,6 +17,15 @@ extern crate rulinalg;
 extern crate num_cpus;
 extern crate crossbeam;
 
+
+mod neuron_gene;
+mod genome;
+mod link_gene;
+mod innovation_database;
+mod innovation;
+mod parameters;
+
+
 // Cerebrum -> Large superior region of brain
 // consists of
 // frontal lobe

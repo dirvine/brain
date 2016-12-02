@@ -1,5 +1,7 @@
+use std::time::Duration;
+
 /// All possible neuron types
-pub enum NeuronType {
+pub enum NeuronGeneType {
     In,
     Out,
     Hidden,
@@ -31,9 +33,9 @@ enum ActivationFunction {
 /// to each other. In Nodes only have out synapses and likewise Out nodes only
 /// have In synapses
 /// Hidden Nodes have both in and out synapses.
-pub struct Neuron {
+pub struct NeuronGene {
     id: u64,
-    node_type: NeuronType,
+    node_type: NeuronGeneType,
     out_syn: Vec<f64>,
     in_syn: Vec<f64>,
     x: u32, // for plots
@@ -53,18 +55,18 @@ pub struct Neuron {
     // Sine    : using A    (frequency, phase)
     // Square  : using A, B (high phase lenght, low phase length)
     // Linear  : using B    (shift)
-     A: u32,
-     B: u32,
+    A: u32,
+    B: u32,
     // Time constant value used when
     // the neuron is activating in leaky integrator mode
-    time_constant : Duration,
+    time_constant: Duration,
     // Bias value used when the neuron is activating in
     // leaky integrator mode
-    Bias, f64
+    Bias: f64,
     // The type of activation function the neuron has
     activation_function: ActivationFunction,
 }
 
-impl Neuron {}
+impl NeuronGene {}
 
 mod tests {}
