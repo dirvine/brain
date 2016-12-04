@@ -24,6 +24,7 @@ mod link_gene;
 mod innovation_database;
 mod innovation;
 mod parameters;
+mod selection;
 
 
 // Cerebrum -> Large superior region of brain
