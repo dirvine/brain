@@ -1,4 +1,5 @@
 use neuron_gene::NeuronGeneType;
+use rulinalg::matrix::Matrix;
 
 #[define(Debug, PartialEq)]
 struct Neuron {

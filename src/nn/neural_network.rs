@@ -1,4 +1,4 @@
-class NeuralNetwork
+struct NeuralNetwork
 {
     /////////////////////
     // RTRL variables
@@ -93,4 +93,4 @@ class NeuralNetwork
     // save/load from already opened files for reading/writing
     void Save(FILE* a_file);
     bool Load(std::ifstream& a_DataFile);
-
+}

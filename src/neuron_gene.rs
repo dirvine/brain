@@ -29,10 +29,10 @@ enum ActivationFunction {
 
 
 
-/// Nodes have synapses, these are weighted connections
-/// to each other. In Nodes only have out synapses and likewise Out nodes only
-/// have In synapses
-/// Hidden Nodes have both in and out synapses.
+/// Nodes have link genes, these are weighted connections
+/// to each other. In Nodes only have out link genes and likewise Out nodes only
+/// have In link genes
+/// Hidden Nodes have both in and out link genes.
 pub struct NeuronGene {
     id: u64,
     node_type: NeuronGeneType,
