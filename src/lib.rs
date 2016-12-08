@@ -25,6 +25,7 @@ mod innovation_database;
 mod innovation;
 mod parameters;
 mod selection;
+mod traits;
 
 
 // Cerebrum -> Large superior region of brain

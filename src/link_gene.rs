@@ -1,50 +1,52 @@
+use innovation_database::InnovationDatabase;
 use neuron_gene::NeuronGene;
 use std::cmp::Ordering;
+use std::sync::{Arc, Mutex};
+use traits::Traits;
 
 const MIN_WEIGHT: f64 = -1f64;
 const MAX_WEIGHT: f64 = 1f64;
 
 pub struct LinkGene {
-    from_neuron: u32,
-    to_neuron: u32,
-    innovation: u64,
+    from_neuron: Arc<Mutex<NeuronGene>>,
+    to_neuron: Arc<Mutex<NeuronGene>>,
     weight: f64,
+    added_weight: f64,
     recurrent: bool,
-    enabled: bool,
+    time_delay: bool,
+    link_trait: Arc<Mutex<Traits>>,
+    innovation: u64,
 }
 
 impl LinkGene {
     /// Create a new synapse
-    pub fn new(from_neuron: u32,
-               to_neuron: u32,
-               innovation: u64,
+    pub fn new(link_trait: Arc<Mutex<Traits>>,
+               from_neuron: Arc<Mutex<NeuronGene>>,
+               to_neuron: Arc<Mutex<NeuronGene>>,
                weight: f64,
                recurrent: bool,
-               enabled: bool)
+               innovation: u64)
                -> LinkGene {
         assert!(MIN_WEIGHT <= weight && weight <= MAX_WEIGHT);
         LinkGene {
-            from_neuron: from_neuron,
-            to_neuron: to_neuron,
-            innovation: innovation,
+            from_neuron: from_neuron.clone(),
+            to_neuron: to_neuron.clone(),
             weight: weight,
+            added_weight: 0f64,
             recurrent: recurrent,
-            enabled: enabled,
+            time_delay: false,
+            link_trait: link_trait,
+            innovation: innovation,
         }
     }
     /// Getter
-    pub fn from_neuron(&self) -> u32 {
-        self.from_neuron
+    pub fn from_neuron(&self) -> Arc<Mutex<NeuronGene>> {
+        self.from_neuron.clone()
     }
 
     /// Getter
-    pub fn to_neuron(&self) -> u32 {
-        self.to_neuron
-    }
-
-    /// Getter
-    pub fn enabled(&self) -> bool {
-        self.enabled
+    pub fn to_neuron(&self) -> Arc<Mutex<NeuronGene>> {
+        self.to_neuron.clone()
     }
 
     /// Getter
@@ -53,14 +55,13 @@ impl LinkGene {
     }
 
     /// Getter
-    pub fn looped_recurrent(&self) -> bool {
-        self.from_neuron == self.to_neuron
-    }
-
-
-    /// Getter
     pub fn innovation(&self) -> u64 {
         self.innovation
+    }
+
+    /// Getter
+    pub fn looped_recurrent(&self) -> bool {
+        self.from_neuron.lock().unwrap().innovation() == self.to_neuron.lock().unwrap().innovation()
     }
 
     /// Getter

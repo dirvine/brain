@@ -1,7 +1,7 @@
 [package]
 authors = ["David Irvine <david.irvine@maidsafe.net>"]
-name = "brain"
-version = "0.1.0"
+name = "neuroevolution"
+version = "0.0.1"
 
 [dependencies]
 crossbeam = "~0.2.10"
