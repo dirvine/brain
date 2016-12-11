@@ -12,6 +12,8 @@
 //! (http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf)
 //! This implementation is a playground for the moment.
 
+#[macro_use]
+extern crate log;
 extern crate rand;
 extern crate rulinalg;
 extern crate num_cpus;
@@ -23,9 +25,14 @@ mod genome;
 mod link_gene;
 mod innovation_database;
 mod innovation;
+mod organism;
+mod species;
+mod population;
 mod parameters;
 mod selection;
 mod traits;
+mod network;
+mod novelty_item;
 
 
 // Cerebrum -> Large superior region of brain

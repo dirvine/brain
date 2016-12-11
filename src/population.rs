@@ -1,130 +1,161 @@
+use genome::Genome;
+use innovation::Innovation;
+use organism::Organism;
+use species::Species;
+use std::sync::{Arc, Mutex};
 
-// ---------------------------------------------
-	// POPULATION CLASS:
-	//   A Population is a group of Organisms
-	//   including their species
-	// ---------------------------------------------
-	class Population {
+///   A Population is a group of Organisms
+///   including their species
+pub struct Population {
+    // # The population
+    organisms: Vec<Organism>, // The organisms in the Population
+    species: Vec<Species>, /* Species in the Population. Note that the species should comprise all the genomes */
+    // ******* Member variables used during reproduction *******
+    innovations: Vec<Innovation>, // For holding the genetic innovations of the newest generation
+    cur_node_id: u32, // Current label number available
+    cur_innov_num: f64,
+    last_species: usize, // The highest species number
+    // ******* Fitness Statistics *******
+    mean_fitness: f64,
+    variance: f64,
+    standard_deviation: f64,
+    winnergen: u32, // An integer that when above zero tells when the first winner appeared
+    // ******* When do we need to delta code? *******
+    highest_fitness: f64, // Stagnation detector
+    highest_last_changed: u32, // If too high, leads to delta coding
+}
 
-	protected:
+impl Population {
+    // A Population can be spawned off of a single Genome
+    // There will be size Genomes added to the Population
+    // The Population does not have to be empty to add Genomes
+    pub fn spawn(g: &Genome, size: usize) {
+        let count;
+        let new_genome = Genome::new();
+        let new_organism = Organism::new();
+        // Create size copies of the Genome
+        // Start with perturbed linkweights
+        for i in 1..size {
+            debug!("CREATING ORGANISM {}", i);
 
-		// A Population can be spawned off of a single Genome
-		// There will be size Genomes added to the Population
-		// The Population does not have to be empty to add Genomes
-		bool spawn(Genome *g,int size);
+            let new_genome = g.duplicate(i);
+            // new_genome->mutate_link_weights(1.0,1.0,GAUSSIAN);
+            new_genome.mutate_link_weights(1.0, 1.0, COLDGAUSSIAN);
+            new_genome.randomize_traits();
+            self.cur_node_id = cur_node_id;
+            self.cur_innov_num = cur_innov_num;;
+            let new_organism = Organism::new(0.0, new_genome, 1);
+            organisms.push_back(new_organism);
+        }
 
-	public:
 
-        std::vector<Organism*> organisms; //The organisms in the Population
+        // Separate the new Population into species
+        speciate();
 
-        std::vector<Species*> species;  // Species in the Population. Note that the species should comprise all the genomes
+    }
 
-		// ******* Member variables used during reproduction *******
-        std::vector<Innovation*> innovations;  // For holding the genetic innovations of the newest generation
-		int cur_node_id;  //Current label number available
-		double cur_innov_num;
+    /// Separate the Organisms into species
+    pub fn speciate(&mut self) {
+        let counter = 0; //Species counter
 
-		int last_species;  //The highest species number
+        // Step through all existing organisms
+        for i in &self.organisms {
+            if self.species.is_empty() {
+                // Create the first species
+                newspecies = Species::new(counter);
+                i.species = newspecies.id;
+                newspecies.add_organism(i);  //Add the current organism
+                species.push(newspecies);
+            }
+            // For each organism, search for a species it is compatible to
+            for j in &self.species {
+                counter += 1;
 
-		// ******* Fitness Statistics *******
-		double mean_fitness;
-		double variance;
-		double standard_deviation;
+                if j.gnome.compatibility(i.gnome) < NEAT::compat_threshold {
+                    // Found compatible species, so add this organism to it
+                    i.species = j.id; //Point organism to its species
+                    j.add_Organism(i);
+                } else {
+                    newspecies = Species::new(counter);
+                    i.species = newspecies.id; //Point organism to its species
+                    newspecies.add_organism(i);  //Add the current organism
+                    species.push(newspecies);
+                }
 
-		int winnergen; //An integer that when above zero tells when the first winner appeared
+            }
+        } //end for
 
-		// ******* When do we need to delta code? *******
-		double highest_fitness;  //Stagnation detector
-		int highest_last_changed; //If too high, leads to delta coding
+        self.last_species = counter;  //Keep track of highest species
 
-		// Separate the Organisms into species
-		bool speciate();
+    }
 
-		// Print Population to a file specified by a string
-		bool print_to_file(std::ostream& outFile);
-
-		// Print Population to a file in speciated order with comments separating each species
-		bool print_to_file_by_species(std::ostream& outFile);
-		bool print_to_file_by_species(char *filename);
-
-		// Prints the champions of each species to files starting with directory_prefix
-		// The file name are as follows: [prefix]g[generation_num]cs[species_num]
-		// Thus, they can be indexed by generation or species
-		bool print_species_champs_tofiles(char *directory_prefix,int generation);
-
-		// Run verify on all Genomes in this Population (Debugging)
-		bool verify();
-
-		// Turnover the population to a new generation using fitness
-		// The generation argument is the next generation
-		bool epoch(int generation);
-
-		// *** Real-time methods ***
-
-		// Places the organisms in species in order from best to worst fitness
-		bool rank_within_species();
-
-		// Estimates average fitness for all existing species
-		void estimate_all_averages();
-
-		//Reproduce only out of the pop champ
-		Organism* reproduce_champ(int generation);
-
-		// Probabilistically choose a species to reproduce
-		// Note that this method is effectively real-time fitness sharing in that the
-		// species will tend to produce offspring in an amount proportional
-		// to their average fitness, which approximates the generational
-		// method of producing the next generation of the species en masse
-		// based on its average (shared) fitness.
-		Species *choose_parent_species();
-
-		//Remove a species from the species list (sometimes called by remove_worst when a species becomes empty)
-		bool remove_species(Species *spec);
-
-		// Removes worst member of population that has been around for a minimum amount of time and returns
-		// a pointer to the Organism that was removed (note that the pointer will not point to anything at all,
-		// since the Organism it was pointing to has been deleted from memory)
-		Organism* remove_worst();
-
-		//Warning: rtNEAT does not behave like regular NEAT if you remove the worst probabilistically
-		//You really should just use "remove_worst," which removes the org with worst adjusted fitness.
-		Organism* remove_worst_probabilistic();
-
-		//KEN: New 2/17/04
-		//This method takes an Organism and reassigns what Species it belongs to
-		//It is meant to be used so that we can reasses where Organisms should belong
-		//as the speciation threshold changes.
-        void reassign_species(Organism *org);
-
-		//Move an Organism from one Species to another (called by reassign_species)
-		void switch_species(Organism *org, Species *orig_species, Species *new_species);
-
-		// Construct off of a single spawning Genome
-		Population(Genome *g,int size);
-
-		// Construct off of a single spawning Genome without mutation
-		Population(Genome *g,int size, float power);
-
-		//MSC Addition
-		// Construct off of a vector of genomes with a mutation rate of "power"
-		Population(std::vector<Genome*> genomeList, float power);
-
-		bool clone(Genome *g,int size, float power);
-
-		//// Special constructor to create a population of random topologies
-		//// uses Genome(int i, int o, int n,int nmax, bool r, double linkprob)
-		//// See the Genome constructor for the argument specifications
-		//Population(int size,int i,int o, int nmax, bool r, double linkprob);
-
-		// Construct off of a file of Genomes
-		Population(const char *filename);
-
-		// It can delete a Population in two ways:
-		//    -delete by killing off the species
-		//    -delete by killing off the organisms themselves (if not speciated)
-		// It does the latter if it sees the species list is empty
-		~Population();
-
+    // 		// Separate the Organisms into species
+    // 		bool speciate();
+    // 		// Print Population to a file specified by a string
+    // 		bool print_to_file(std::ostream& outFile);
+    // 		// Print Population to a file in speciated order with comments separating each species
+    // 		bool print_to_file_by_species(std::ostream& outFile);
+    // 		bool print_to_file_by_species(char *filename);
+    // 		// Prints the champions of each species to files starting with directory_prefix
+    // 		// The file name are as follows: [prefix]g[generation_num]cs[species_num]
+    // 		// Thus, they can be indexed by generation or species
+    // 		bool print_species_champs_tofiles(char *directory_prefix,int generation);
+    // 		// Run verify on all Genomes in this Population (Debugging)
+    // 		bool verify();
+    // 		// Turnover the population to a new generation using fitness
+    // 		// The generation argument is the next generation
+    // 		bool epoch(int generation);
+    // 		// *** Real-time methods ***
+    // 		// Places the organisms in species in order from best to worst fitness
+    // 		bool rank_within_species();
+    // 		// Estimates average fitness for all existing species
+    // 		void estimate_all_averages();
+    // 		//Reproduce only out of the pop champ
+    // 		Organism* reproduce_champ(int generation);
+    // 		// Probabilistically choose a species to reproduce
+    // 		// Note that this method is effectively real-time fitness sharing in that the
+    // 		// species will tend to produce offspring in an amount proportional
+    // 		// to their average fitness, which approximates the generational
+    // 		// method of producing the next generation of the species en masse
+    // 		// based on its average (shared) fitness.
+    // 		Species *choose_parent_species();
+    // 		//Remove a species from the species list (sometimes called by remove_worst when a species becomes empty)
+    // 		bool remove_species(Species *spec);
+    // 		// Removes worst member of population that has been around for a minimum amount of time and returns
+    // 		// a pointer to the Organism that was removed (note that the pointer will not point to anything at all,
+    // 		// since the Organism it was pointing to has been deleted from memory)
+    // 		Organism* remove_worst();
+    // 		//Warning: rtNEAT does not behave like regular NEAT if you remove the worst probabilistically
+    // 		//You really should just use "remove_worst," which removes the org with worst adjusted fitness.
+    // 		Organism* remove_worst_probabilistic();
+    // 		//KEN: New 2/17/04
+    // 		//This method takes an Organism and reassigns what Species it belongs to
+    // 		//It is meant to be used so that we can reasses where Organisms should belong
+    // 		//as the speciation threshold changes.
+    //         void reassign_species(Organism *org);
+    // 		//Move an Organism from one Species to another (called by reassign_species)
+    // 		void switch_species(Organism *org, Species *orig_species, Species *new_species);
+    // 		// Construct off of a single spawning Genome
+    // 		Population(Genome *g,int size);
+    // 		// Construct off of a single spawning Genome without mutation
+    // 		Population(Genome *g,int size, float power);
+    // 		//MSC Addition
+    // 		// Construct off of a vector of genomes with a mutation rate of "power"
+    // 		Population(std::vector<Genome*> genomeList, float power);
+    // 		bool clone(Genome *g,int size, float power);
+    // 		//// Special constructor to create a population of random topologies
+    // 		//// uses Genome(int i, int o, int n,int nmax, bool r, double linkprob)
+    // 		//// See the Genome constructor for the argument specifications
+    // 		//Population(int size,int i,int o, int nmax, bool r, double linkprob);
+    // 		// Construct off of a file of Genomes
+    // 		Population(const char *filename);
+    // 		// It can delete a Population in two ways:
+    // 		//    -delete by killing off the species
+    // 		//    -delete by killing off the organisms themselves (if not speciated)
+    // 		// It does the latter if it sees the species list is empty
+    // 		~Population();
+    // }
+}
 
 // Population::Population(Genome *g,int size) {
 // 	winnergen=0;
@@ -401,13 +432,13 @@
 // 	return true;
 // }
 //
-// bool Population::speciate() {
-// 	std::vector<Organism*>::iterator curorg;  //For stepping through Population
-// 	std::vector<Species*>::iterator curspecies; //Steps through species
-// 	Organism *comporg=0;  //Organism for comparison
-// 	Species *newspecies; //For adding a new species
+// pub fn speciate(&self) {
+// // 	std::vector<Organism*>::iterator curorg;  //For stepping through Population
+// // 	std::vector<Species*>::iterator curspecies; //Steps through species
+// // 	Organism *comporg=0;  //Organism for comparison
+// // 	Species *newspecies; //For adding a new species
 //
-// 	int counter=0; //Species counter
+// 	let counter=0; //Species counter
 //
 // 	//Step through all existing organisms
 // 	for(curorg=organisms.begin();curorg!=organisms.end();++curorg) {
@@ -1586,4 +1617,4 @@
 // //
 // //return true;
 // //
-// //}
+// //
