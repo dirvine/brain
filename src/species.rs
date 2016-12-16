@@ -6,9 +6,10 @@ use std::f64;
 ///   Reproduction takes place mostly within a
 ///   single species, so that compatible organisms
 ///   can mate.
+#[derive(Clone)]
 pub struct Species {
-    id: u32,
-    age: u64, // The age of the Species
+    id: u32, // TODO Should this also be an innovation number ???
+    age: u64, // The age of the Species in iterations ????
     ave_fitness: f64, // The average fitness of the Species
     max_fitness: f64, // Max fitness of the Species
     max_fitness_ever: f64, // The max it ever had
@@ -35,6 +36,7 @@ impl Species {
             max_fitness: 0.0,
             max_fitness_ever: 0.0,
             average_est: 0.0,
+            organisms: Vec::new(),
         }
     }
     /// New novel species
@@ -50,11 +52,25 @@ impl Species {
             max_fitness: 0.0,
             max_fitness_ever: 0.0,
             average_est: 0.0,
+            organisms: Vec::new(),
         }
+    }
+
+    /// TODO
+    pub fn set_id(&mut self, id: u32) {
+        self.id = id;
+    }
+    /// Getter
+    pub fn id(&self) -> u32 {
+        self.id
+    }
+    /// TODO
+    pub fn add_organism(&mut self, org: Organism) {
+        self.organisms.push(org);
     }
     /// Place organisms in this species in order by their fitness
     pub fn rank(&mut self) {
-        self.organisms.sort_by(|x, y| (x.fitness() - y.fitness()).abs() < f64::EPSILON);
+        self.organisms.sort_by(|x, y| x.fitness().partial_cmp(&y.fitness()).unwrap());
     }
     /// Average species fitness
     pub fn estimate_average(&self) -> f64 {
@@ -66,11 +82,15 @@ impl Species {
 
         for i in &self.organisms {
             if i.old_enough() {
-                total += i.fitness;
-                num_orgs += 1;
+                total += i.fitness();
+                num_orgs += 1f64;
             }
         }
-        return if num_orgs > 0 { total / num_orgs } else { 0 };
+        return if num_orgs > 0f64 {
+            total / num_orgs
+        } else {
+            0f64
+        };
     }
 
     pub fn reproduce_one(generation: u32,

@@ -4,7 +4,7 @@ use rand;
 ///        algorithm from having to search vast parameter landscapes
 ///        on every node.  Instead, each node can simply point to a trait
 ///        and those traits can evolve on their own
-#[derive(PartialEq, PartialOrd, Default)]
+#[derive(PartialEq, PartialOrd, Default, Clone)]
 pub struct Traits {
     // ************ LEARNING PARAMETERS ***********
     // The following parameters are for use in
@@ -21,6 +21,10 @@ impl Traits {
             trait_id: id,
             params: params,
         }
+    }
+    /// Getter
+    pub fn trait_id(&self) -> u32 {
+        self.trait_id
     }
     /// Mutate this trait
     pub fn mutate(&mut self, probability: f64, mutation_power: f64) {

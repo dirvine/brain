@@ -1,27 +1,53 @@
 use genome::Genome;
-use neuron_gene::NeuronGene;
 use std::rc::Rc;
 
 /// A NETWORK is a LIST of input NODEs and a LIST of output NODEs
 ///   The point of the network is to define a single entity which can evolve
 ///   or learn on its own, even though it may be part of a larger framework
+#[derive(Clone)]
 pub struct Network {
-    numnodes: u64, // The number of nodes in the net (-1 means not yet counted)
-    numlinks: u64, // The number of links in the net (-1 means not yet counted)
-
-    all_nodes: Vec<NeuronGene>, // A list of all the nodes
-    genotype: Rc<Genome>, // Allows Network to be matched with its Genome
-
+    genotype: Genome, // Allows Network to be matched with its Genome
     name: String, // Every Network or subNetwork can have a name
-    inputs: Vec<NeuronGene>, // NNodes that input into the network
-    outputs: Vec<NeuronGene>, // Values output by the network
-
     net_id: u32, // Allow for a network id
-
     maxweight: f64, // Maximum weight in network for adaptation purposes
-
     adaptable: bool, // Tells whether network can adapt or not
 }
+
+impl Network {
+    /// All nodes in network
+    pub fn num_nodes(&self) -> usize {
+        self.genotype.num_nodes()
+    }
+    /// All links in network
+    pub fn links(&self) -> usize {
+        unimplemented!()
+    }
+    /// All inout nodes
+    pub fn num_inputs(&self) -> usize {
+        unimplemented!()
+        // self.genotype.num_inputs()
+    }
+    // /// Add an input Neuron - connect to any existing outputs
+    // pub fn add_input_neuron(&mut self, neuron: NeuronGene) {
+    //     neuron.set_type(NeuronType::Sensor(default::Default));
+    //     self.neuron_genes.push(neuron)
+    // }
+    // /// Add an input Neuron - connect to any existing sensors
+    // pub fn add_output_neuron(&mut self, neuron: NeuronGene) {
+    //     neuron.set_type(NeuronType::Output);
+    //     self.neuron_genes.push(neuron)
+    // }
+    //
+    // /// If all output are not active then return true
+    // pub fn are_outputs_off(&self) -> bool {
+    //     self.genotype
+    //         .neuron_genes()
+    //         .iter()
+    //         .filter(|x| x.gen_node_label == NeuronPlace::Out && x.active())
+    //         .count() > 0
+    // }
+}
+
 // // This constructor allows the input and output lists to be supplied
 // // Defaults to not using adaptation
 // Network(std::vector<NNode*> in,std::vector<NNode*> out,std::vector<NNode*> all,int netid);
@@ -138,42 +164,6 @@ pub struct Network {
 // }
 //
 //
-// Network::Network(const Network& network)
-// {
-// 	std::vector<NNode*>::const_iterator curnode;
-//
-// 	// Copy all the inputs
-// 	for(curnode = network.inputs.begin(); curnode != network.inputs.end(); ++curnode) {
-// 		NNode* n = new NNode(**curnode);
-// 		inputs.push_back(n);
-// 		all_nodes.push_back(n);
-// 	}
-//
-// 	// Copy all the outputs
-// 	for(curnode = network.outputs.begin(); curnode != network.outputs.end(); ++curnode) {
-// 		NNode* n = new NNode(**curnode);
-// 		outputs.push_back(n);
-// 		all_nodes.push_back(n);
-// 	}
-//
-// 	if(network.name)
-// 		name = strdup(network.name);
-// 	else
-// 		name = 0;
-//
-// 	numnodes = network.numnodes;
-// 	numlinks = network.numlinks;
-// 	net_id = network.net_id;
-// 	adaptable = network.adaptable;
-// }
-//
-// Network::~Network() {
-// 			if (name!=0)
-// 				delete [] name;
-//
-// 			destroy();  // Kill off all the nodes and links
-//
-// 		}
 //
 // // Puts the network back into an initial state
 // void Network::flush() {
@@ -199,16 +189,6 @@ pub struct Network {
 // 	}
 // }
 //
-// // If all output are not active then return true
-// bool Network::outputsoff() {
-// 	std::vector<NNode*>::iterator curnode;
-//
-// 	for(curnode=outputs.begin();curnode!=outputs.end();++curnode) {
-// 		if (((*curnode)->activation_count)==0) return true;
-// 	}
-//
-// 	return false;
-// }
 //
 // // Print the connections weights to a file separated by only carriage returns
 // void Network::print_links_tofile(char *filename) {
@@ -379,34 +359,6 @@ pub struct Network {
 //
 // 	return true;
 // }
-//
-// // THIS WAS NOT USED IN THE FINAL VERSION, AND NOT FULLY IMPLEMENTED,
-// // BUT IT SHOWS HOW SOMETHING LIKE THIS COULD BE INITIATED
-// // Note that checking networks for loops in general in not necessary
-// // and therefore I stopped writing this function
-// // Check Network for loops.  Return true if its ok, false if there is a loop.
-// //bool Network::integrity() {
-// //  std::vector<NNode*>::iterator curnode;
-// //  std::vector<std::vector<NNode*>*> paths;
-// //  int count;
-// //  std::vector<NNode*> *newpath;
-// //  std::vector<std::vector<NNode*>*>::iterator curpath;
-//
-// //  for(curnode=outputs.begin();curnode!=outputs.end();++curnode) {
-// //    newpath=new std::vector<NNode*>();
-// //    paths.push_back(newpath);
-// //    if (!((*curnode)->integrity(newpath))) return false;
-// //  }
-//
-// //Delete the paths now that we are done
-// //  curpath=paths.begin();
-// //  for(count=0;count<paths.size();count++) {
-// //    delete (*curpath);
-// //    curpath++;
-// //  }
-//
-// //  return true;
-// //}
 //
 // // Prints the values of its outputs
 // void Network::show_activation() {

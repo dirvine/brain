@@ -8,6 +8,7 @@ use std::time::{Duration, Instant};
 ///   Organisms are Genomes and Networks with fitness
 ///   information
 ///   i.e. The genotype and phenotype together
+#[derive(Clone)]
 pub struct Organism {
     params: Params,
     fitness: f64, // A measure of fitness for the Organism
@@ -32,17 +33,27 @@ pub struct Organism {
     mate_baby: bool,
 
     // MetaData for the object
-    metadata: [u8; 128],
+    metadata: [u8; 32],
     modified: bool,
 }
 
 impl Organism {
+    /// TODO
+    pub fn new(fitness: f64, genome: Genome, generation: u32) -> Organism {
+        unimplemented!()
+    }
     /// Is this organism counted as "alive" (lived at least long enough)
     pub fn old_enough(&self) -> bool {
-        self.params.time_alive_min() >= self.created_at
+        self.params.time_alive_min() >= self.created_at.elapsed()
     }
     pub fn fitness(&self) -> f64 {
         self.fitness
+    }
+    pub fn genome(&self) -> &Genome {
+        &self.genome
+    }
+    pub fn species(&mut self) -> &mut Species {
+        &mut self.species
     }
 }
 

@@ -1,19 +1,20 @@
 use genome::Genome;
 use innovation::Innovation;
 use organism::Organism;
+use parameters::Params;
 use species::Species;
 use std::sync::{Arc, Mutex};
+
 
 ///   A Population is a group of Organisms
 ///   including their species
 pub struct Population {
+    params: Params,
     // # The population
     organisms: Vec<Organism>, // The organisms in the Population
     species: Vec<Species>, /* Species in the Population. Note that the species should comprise all the genomes */
     // ******* Member variables used during reproduction *******
-    innovations: Vec<Innovation>, // For holding the genetic innovations of the newest generation
-    cur_node_id: u32, // Current label number available
-    cur_innov_num: f64,
+    innovations: usize, /* Innovation numbers, links is single, but a node added will use the same innovation number for the neuron id and the link it creates. */
     last_species: usize, // The highest species number
     // ******* Fitness Statistics *******
     mean_fitness: f64,
@@ -23,69 +24,79 @@ pub struct Population {
     // ******* When do we need to delta code? *******
     highest_fitness: f64, // Stagnation detector
     highest_last_changed: u32, // If too high, leads to delta coding
+    next_node_id: u32,
+    next_innovation_number: u32,
 }
 
 impl Population {
     // A Population can be spawned off of a single Genome
     // There will be size Genomes added to the Population
     // The Population does not have to be empty to add Genomes
-    pub fn spawn(g: &Genome, size: usize) {
-        let count;
-        let new_genome = Genome::new();
-        let new_organism = Organism::new();
+    pub fn spawn(&mut self, g: &Genome, size: usize) {
         // Create size copies of the Genome
         // Start with perturbed linkweights
         for i in 1..size {
             debug!("CREATING ORGANISM {}", i);
 
-            let new_genome = g.duplicate(i);
+            let mut new_genome = g.duplicate(i as u32);
             // new_genome->mutate_link_weights(1.0,1.0,GAUSSIAN);
-            new_genome.mutate_link_weights(1.0, 1.0, COLDGAUSSIAN);
-            new_genome.randomize_traits();
-            self.cur_node_id = cur_node_id;
-            self.cur_innov_num = cur_innov_num;;
+            new_genome.mutate_link_weights(1.0, 1.0, 1.0);
+            new_genome.randomise_traits();
+            let cur_node_id = self.next_node_id();
+            let cur_innov_num = self.next_innovation_number();
             let new_organism = Organism::new(0.0, new_genome, 1);
-            organisms.push_back(new_organism);
+            self.organisms.push(new_organism);
         }
 
 
         // Separate the new Population into species
-        speciate();
+        self.speciate();
 
+    }
+    /// Getter
+    pub fn next_node_id(&mut self) -> u32 {
+        self.next_node_id += 1;
+        self.next_node_id
+    }
+    /// Getter
+    pub fn next_innovation_number(&mut self) -> u32 {
+        self.next_innovation_number += 1;
+        self.next_innovation_number
     }
 
     /// Separate the Organisms into species
     pub fn speciate(&mut self) {
-        let counter = 0; //Species counter
+        let mut counter = 0; //Species counter
+        let mut species = Vec::new();
 
         // Step through all existing organisms
-        for i in &self.organisms {
+        for mut i in self.organisms.drain(..) {
             if self.species.is_empty() {
                 // Create the first species
-                newspecies = Species::new(counter);
-                i.species = newspecies.id;
-                newspecies.add_organism(i);  //Add the current organism
-                species.push(newspecies);
+                let mut newspecies = Species::new(counter);
+                newspecies.add_organism(i.clone());  //Add the current organism
+                self.species.push(newspecies);
             }
             // For each organism, search for a species it is compatible to
-            for j in &self.species {
+            for j in &mut self.species {
                 counter += 1;
 
-                if j.gnome.compatibility(i.gnome) < NEAT::compat_threshold {
+                if i.genome().compatibility(i.genome()) < self.params.compat_threshold() {
                     // Found compatible species, so add this organism to it
-                    i.species = j.id; //Point organism to its species
-                    j.add_Organism(i);
+                    i.species().set_id(j.id()); //Point organism to its species
+                    j.add_organism(i.clone());
                 } else {
-                    newspecies = Species::new(counter);
-                    i.species = newspecies.id; //Point organism to its species
-                    newspecies.add_organism(i);  //Add the current organism
+                    let mut newspecies = Species::new(counter);
+                    i.species().set_id(newspecies.id()); //Point organism to its species
+                    newspecies.add_organism(i.clone());  //Add the current organism
                     species.push(newspecies);
                 }
 
             }
+            self.species = species.iter().cloned().collect();
         } //end for
 
-        self.last_species = counter;  //Keep track of highest species
+        self.last_species = counter as usize;  //Keep track of highest species
 
     }
 

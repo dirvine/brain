@@ -5,12 +5,13 @@ const ARCHIVE_SEED_AMOUNT: usize = 1;
 
 
 // a novelty item is a "stake in the ground" i.e. a novel phenotype
+#[derive(Clone)]
 pub struct NoveltyItem {
     added: bool,
     indiv_number: u32,
     // we can keep track of genotype & phenotype of novel item
-    genotype: Genome,
-    phenotype: Network,
+    genotype: Option<Genome>,
+    phenotype: Option<Network>,
 
     // used to collect data
     data: Vec<Vec<f64>>,
@@ -29,11 +30,14 @@ impl NoveltyItem {
     pub fn new() -> NoveltyItem {
         NoveltyItem {
             added: false,
-            genotype: NULL,
-            phenotype: NULL,
+            genotype: None,
+            phenotype: None,
             age: 0.0,
             generation: 0.0,
-            indiv_number: -1,
+            indiv_number: 0,
+            data: Vec::new(),
+            fitness: 0f64,
+            novelty: 0f64,
         }
     }
 

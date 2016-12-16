@@ -1,12 +1,12 @@
-use link_gene::LinkGene;
-use neuron_gene::NeuronGene;
+use link::Link;
+use network_node::NetworkNode;
 
 #[derive(PartialEq, PartialOrd)]
 pub enum InnovationType {
     // neuron_id, type
-    Neuron(NeuronGene),
+    Neuron(NetworkNode),
     // from, to
-    Link(LinkGene),
+    Link(Link),
 }
 
 /// This Innovation class serves as a way to record innovations

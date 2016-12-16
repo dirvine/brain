@@ -1,28 +1,19 @@
-use link_gene::LinkGene;
+use link::Link;
 use std::cmp::Ordering;
+use std::rc::Rc;
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
 use traits::Traits;
 
-/// Neuron types
-#[derive(PartialEq, PartialOrd)]
-pub enum NeuronType {
-    Neuron(Vec<LinkGene>), // imput links
-    Sensor(f64), // output values
+/// Node types
+#[derive(PartialEq, PartialOrd, Clone)]
+pub enum NodeType {
+    Sensor,
+    Input,
 }
 
-/// All possible neuron places
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
-pub enum NeuronPlace {
-    In,
-    Out,
-    Hidden,
-    Bias,
-    NotUsed,
-}
 
 /// Activation function types
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
 enum ActivationFunction {
     SignedSigmoid, // Sigmoid function   (default) (blurred cutting plane)
     UnSignedSigmoid,
@@ -41,16 +32,13 @@ enum ActivationFunction {
 }
 
 
-
-/// Nodes have link genes, these are weighted connections
-/// to each other. In Nodes only have out link genes and likewise Out nodes only
-/// have In link genes
-/// Hidden Nodes have both in and out link genes.
-/// A NODE is either a NEURON or a SENSOR.
-///   - If it's a sensor, it can be loaded with a value for output
-/// - If it's a neuron, it has a list of its incoming input signals
+/// Nodes have links these are weighted connections
+/// to each other. In Nodes only have out links and likewise Out nodes only
+/// have In links
+/// Hidden Nodes have both in and out links.
 /// Use an activation count to avoid flushing
-pub struct NeuronGene {
+#[derive(Clone)]
+pub struct NetworkNode {
     innovation: u64,
     activation_count: u32, // keeps track of which activation the node is currently in
     last_activation: f64, // Holds the previous step's activation for recurrency
@@ -60,40 +48,29 @@ pub struct NeuronGene {
     // The innode then needs to send from TWO time steps ago
     nodetrait: Traits, // Points to a trait of parameters
     trait_id: u32, // identify the trait derived by this node
-    dup: Arc<Mutex<NeuronGene>>, // Used for Genome duplication
-    analogue: Arc<Mutex<NeuronGene>>, // Used for Gene decoding
+    dup: Arc<Mutex<NetworkNode>>, // Used for Genome duplication
+    analogue: Arc<Mutex<NetworkNode>>, // Used for Gene decoding
     overriden: bool, // The NNode cannot compute its own output- something is overriding it
     override_value: f64, // Contains the activation value that will override this node's activation
     // Pointer to the Sensor corresponding to this Body.
     // Sensor* mySensor;
     frozen: bool, // When frozen, cannot be mutated (meaning its trait pointer is fixed)
-    ftype: ActivationFunction, // type is either SIGMOID ..or others that can be added
-    nodetype: NeuronType, // type is either NEURON or SENSOR
+    activation_function: ActivationFunction, // type is either SIGMOID ..or others that can be added
+    nodetype: NodeType, // type is either NEURON or SENSOR
     activesum: f64, // The incoming activity before being processed
     activation: f64, // The total activation entering the NNode
     active_flag: bool, // To make sure outputs are active
-    // NOT USED IN NEAT - covered by "activation" above
-    output: f64, // Output of the NNode- the value in the NNode
     // ************ LEARNING PARAMETERS ***********
     // The following parameters are for use in
     //   neurons that learn through habituation,
     //   sensitization, or Hebbian-type processes
     params: Vec<f64>,
-    incoming: Vec<Arc<Mutex<LinkGene>>>, /* A list of pointers to incoming weighted signals from other
-                                          * nodes */
-    outgoing: Vec<Arc<Mutex<LinkGene>>>, // A list of pointers to links carrying this node's signal
-    // ###################################
-    // These members are used for graphing
-    // ###################################
-    rowlevels: Vec<f64>, // Depths from output where this node appears
-    row: u32, // Final row decided upon for drawing this NNode in
-    ypos: u32,
-    xpos: u32,
-    node_id: u32, // A node can be given an identification number for saving in files
-    gen_node_label: NeuronPlace, // Used for genetic marking of nodes
+    incoming: Vec<Rc<Link>>, /* A list of pointers to incoming weighted signals from other
+                              * nodes */
+    outgoing: Vec<Rc<Link>>, // A list of pointers to links carrying this node's signal
 }
 
-impl NeuronGene {
+impl NetworkNode {
     // 		NNode(nodetype ntype,int nodeid);
     //
     // 		NNode(nodetype ntype,int nodeid, nodeplace placement);
@@ -116,13 +93,17 @@ impl NeuronGene {
     // 		// Return activation from PREVIOUS time step
     // 		double get_active_out_td();
     //
-    // Returns the type of the node, NEURON or SENSOR
-    pub fn get_type(&self) -> &NeuronType {
+    /// Getter
+    pub fn neuron_type(&self) -> &NodeType {
         &self.nodetype
     }
+    // /// Getter
+    // pub fn gen_node_label(&self) -> &NodePlace {
+    //     &self.gen_node_label
+    // }
     //
-    /// Allows alteration between NEURON and SENSOR.  Returns its argument
-    pub fn set_type(&mut self, nodetype: NeuronType) {
+    /// Allows alteration between NEURON and SENSOR.
+    pub fn set_type(&mut self, nodetype: NodeType) {
         self.nodetype = nodetype;
     }
 
@@ -131,17 +112,24 @@ impl NeuronGene {
         self.innovation
     }
 
+    /// Reset activations
+    pub fn flush(&mut self) {
+        self.activation_count = 0;
+        self.last_activation = 0f64;
+        self.last_activation2 = 0f64;
+        self.activation = 0f64;
+    }
     /// If the node is a SENSOR, returns true and loads the value
     pub fn sensor_load(&mut self, load: f64) -> bool {
         match self.nodetype {
-            NeuronType::Sensor(_) => {
+            NodeType::Sensor => {
                 self.last_activation2 = self.last_activation;
                 self.last_activation = self.activation;
                 self.activation_count += 1;
                 self.activation = load;
                 true
             }
-            NeuronType::Neuron(_) => false,
+            _ => false,
         }
     }
     /// Note: NEAT keeps track of which links are recurrent and which
@@ -151,11 +139,19 @@ impl NeuronGene {
     /// 2. It allows genetic control of the proportion of connections
     ///    that may become recurrent
     /// Add an incoming connection a node
-    /// Adds a NONRECURRENT Link to a new NNode in the incoming List
-    pub fn add_incoming_connection(node: &NeuronGene, weight: f64) {}
-
-    /// Adds a RECURRENT Link to a new NNode in the incoming List
-    pub fn add_incoming_recurrent_conneciton(node: &NeuronGene, weight: f64) {}
+    pub fn add_incoming_connection(&mut self, node: Rc<Link>) {
+        self.incoming.push(node);
+    }
+    /// Add an outgoing connection
+    pub fn add_outgoing_connection(&mut self, node: Rc<Link>) {
+        self.outgoing.push(node);
+    }
+    /// Add a recurrent connection
+    pub fn add_recurrent_connection(&mut self, node: Rc<Link>) {
+        unimplemented!()
+        // self.outgoing.push(node);
+        // self.incoming.push(node);
+    }
     // 		// Recursively deactivate backwards through the network
     // 		void flushback();
     //
@@ -186,27 +182,25 @@ impl NeuronGene {
     // 		void Lamarck();
     //
     // 		//Find the greatest depth starting from this neuron at depth d
-    // 		int depth(int d,Network *mynet,int& count, int thresh);
-    // }
 }
 
-impl Eq for NeuronGene {}
+impl Eq for NetworkNode {}
 
-impl PartialEq for NeuronGene {
-    fn eq(&self, other: &NeuronGene) -> bool {
+impl PartialEq for NetworkNode {
+    fn eq(&self, other: &NetworkNode) -> bool {
         self.innovation == other.innovation
     }
 }
 
 
-impl PartialOrd for NeuronGene {
-    fn partial_cmp(&self, other: &NeuronGene) -> Option<Ordering> {
+impl PartialOrd for NetworkNode {
+    fn partial_cmp(&self, other: &NetworkNode) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl Ord for NeuronGene {
-    fn cmp(&self, other: &NeuronGene) -> Ordering {
+impl Ord for NetworkNode {
+    fn cmp(&self, other: &NetworkNode) -> Ordering {
         self.innovation.cmp(&other.innovation)
     }
 }

@@ -1,8 +1,10 @@
 use std::time::Duration;
 
+#[derive(Clone, Copy)]
 pub struct Params {
     population_size: u32,
     time_alive_min: Duration,
+    compat_threshold: f64,
 }
 
 
@@ -12,6 +14,7 @@ impl Params {
         Params {
             population_size: 150,
             time_alive_min: Duration::from_millis(10),
+            compat_threshold: 3.3,
         }
     }
     /// Getter
@@ -21,6 +24,10 @@ impl Params {
     /// Getter
     pub fn time_alive_min(&self) -> Duration {
         self.time_alive_min
+    }
+    /// Getter
+    pub fn compat_threshold(&self) -> f64 {
+        self.compat_threshold
     }
 }
 

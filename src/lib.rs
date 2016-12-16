@@ -20,9 +20,10 @@ extern crate num_cpus;
 extern crate crossbeam;
 
 
-mod neuron_gene;
+mod network_node;
 mod genome;
-mod link_gene;
+mod gene;
+mod link;
 mod innovation_database;
 mod innovation;
 mod organism;
@@ -33,6 +34,7 @@ mod selection;
 mod traits;
 mod network;
 mod novelty_item;
+mod weight;
 
 
 // Cerebrum -> Large superior region of brain
