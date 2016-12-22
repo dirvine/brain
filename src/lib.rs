@@ -37,6 +37,13 @@ mod novelty_item;
 mod weight;
 
 
+use rand::distributions::{IndependentSample, Range};
+fn rand_float() -> f64 {
+    let mut rng = rand::thread_rng();
+    Range::new(-1f64, 1.).ind_sample(&mut rng)
+}
+
+
 // Cerebrum -> Large superior region of brain
 // consists of
 // frontal lobe
