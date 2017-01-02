@@ -1,6 +1,7 @@
 use gene::Gene;
 use network::Network;
-use network_node::NetworkNode;
+use network_node::{NetworkNode, NodeType};
+use rand::{Rng, thread_rng};
 use traits::Traits;
 
 /// A Genome is the primary source of genotype information used to create
@@ -33,15 +34,15 @@ impl Genome {
     pub fn num_nodes(&self) -> usize {
         self.network_nodes.len()
     }
-    pub fn num_links(&self) -> usize {
-        self.genes.len()
+    pub fn num_node_links(&self) -> usize {
+        self.network_nodes.iter().fold(0, |sum, x| sum + x.total_links())
     }
-    // pub fn num_inputs(&self) -> usize {
-    //     self.neuron_genes.iter().filter(|x| x.gen_node_label() == NeuronPlace::In).count()
-    // }
-    // pub fn num_outputs(&self) -> usize {
-    //     self.neuron_genes.iter().filter(|x| x.gen_node_label() == NeuronPlace::Out).count()
-    // }
+    pub fn num_inputs(&self) -> usize {
+        self.network_nodes.iter().filter(|&x| *x.node_type() == NodeType::Input).count()
+    }
+    pub fn num_outputs(&self) -> usize {
+        self.network_nodes.iter().filter(|x| *x.node_type() == NodeType::Output).count()
+    }
     pub fn network_nodes(&self) -> &Vec<NetworkNode> {
         &self.network_nodes
     }
@@ -52,18 +53,19 @@ impl Genome {
         self.last_innovation_number
     }
     /// Create a new Genome from existing with new id
-    pub fn duplicate(&self, new_id: u32) -> Genome {
+    pub fn duplicate(&mut self) -> Genome {
+        self.last_node_id += 1;
         Genome {
-            id: new_id,
+            id: self.last_node_id,
             parent1: 0,
             parent2: 0,
             struct_change: 0,
             traits: self.traits.iter().cloned().collect(),
             network_nodes: self.network_nodes.iter().cloned().collect(),
             genes: self.genes.iter().cloned().collect(),
-            network_id: self.network_id,
-            last_node_id: self.last_node_id,
-            last_innovation_number: self.last_innovation_number,
+            network_id: self.network_id.clone(),
+            last_node_id: self.last_node_id.clone(),
+            last_innovation_number: self.last_innovation_number.clone(),
         }
     }
     /// TODO
@@ -78,6 +80,41 @@ impl Genome {
     /// TODO
     pub fn compatibility(&self, genome: &Genome) -> f64 {
         unimplemented!()
+    }
+    /// TODO
+    pub fn mutate_gene_link_trait(&mut self, times: u32) {
+        let mut rng = thread_rng();
+        for i in 0..times {
+            if let Some(atrait) = rng.choose(&mut self.traits) {
+
+                if let Some(gene) = rng.choose_mut(&mut self.genes) {
+                    if !gene.frozen() {
+                        gene.set_link_trait(atrait.clone());
+                    }
+                }
+            }
+        }
+    }
+    /// TODO
+    pub fn mutate_node_trait(&mut self, times: u32) {
+        let mut rng = thread_rng();
+        for i in 0..times {
+            if let Some(atrait) = rng.choose(&mut self.traits) {
+
+                if let Some(node) = rng.choose_mut(&mut self.network_nodes) {
+                    if !node.frozen() {
+                        node.set_node_trait(atrait.clone());
+                    }
+                }
+            }
+        }
+    }
+    /// Select a random trait and mutate it.
+    pub fn mutate_random_trait(&mut self) {
+        let mut rng = thread_rng();
+        if let Some(atrait) = rng.choose_mut(&mut self.traits) {
+            atrait.mutate();
+        }
     }
     // void print_genome(); //Displays Genome on screen
     //

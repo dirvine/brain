@@ -44,7 +44,7 @@ impl Organism {
     }
     /// Is this organism counted as "alive" (lived at least long enough)
     pub fn old_enough(&self) -> bool {
-        self.params.time_alive_min() >= self.created_at.elapsed()
+        *self.params.time_alive_min() >= self.created_at.elapsed()
     }
     pub fn fitness(&self) -> f64 {
         self.fitness

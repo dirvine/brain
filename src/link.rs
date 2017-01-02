@@ -1,5 +1,6 @@
 use innovation_database::InnovationDatabase;
 use network_node::NetworkNode;
+use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::rc::Rc;
 use std::sync::RwLock;
@@ -9,8 +10,8 @@ use weight::Weight;
 
 #[derive(Clone)]
 pub struct Link {
-    onode: Rc<NetworkNode>,
-    inode: Rc<NetworkNode>,
+    onode: RefCell<NetworkNode>,
+    inode: RefCell<NetworkNode>,
     weight: Weight,
     added_weight: f64,
     time_delay: bool,
@@ -22,8 +23,8 @@ pub struct Link {
 
 impl Link {
     /// Create a new synapse
-    pub fn new(onode: Rc<NetworkNode>,
-               inode: Rc<NetworkNode>,
+    pub fn new(onode: RefCell<NetworkNode>,
+               inode: RefCell<NetworkNode>,
                link_trait: Traits,
                weight: Weight,
                innovation: u64,
@@ -42,8 +43,8 @@ impl Link {
         }
     }
     /// Create a new synapse with no link trait
-    pub fn new_without_trait(onode: Rc<NetworkNode>,
-                             inode: Rc<NetworkNode>,
+    pub fn new_without_trait(onode: RefCell<NetworkNode>,
+                             inode: RefCell<NetworkNode>,
                              weight: Weight,
                              innovation: u64,
                              recur: bool)
@@ -61,6 +62,10 @@ impl Link {
         }
     }
 
+    /// Set link trait
+    pub fn set_trait(&mut self, traits: Traits) {
+        self.link_trait = Some(traits);
+    }
 
     /// Getter
     pub fn innovation(&self) -> u64 {
@@ -69,7 +74,7 @@ impl Link {
 
     /// Getter
     pub fn looped_recurrent(&self) -> bool {
-        self.onode.innovation() == self.inode.innovation()
+        self.onode.borrow().innovation() == self.inode.borrow().innovation()
     }
 
     /// Getter
@@ -79,6 +84,14 @@ impl Link {
     /// Getter
     pub fn recur(&self) -> bool {
         self.recur
+    }
+    /// Getter
+    pub fn inode(&mut self) -> RefCell<NetworkNode> {
+        self.inode.clone()
+    }
+    /// Setter
+    pub fn set_added_weight(&mut self, w: f64) {
+        self.added_weight = w;
     }
 }
 

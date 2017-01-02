@@ -1,3 +1,4 @@
+use parameters::Params;
 use rand;
 /// TRAIT: A Trait is a group of parameters that can be expressed
 ///        as a group more than one time.  Traits save a genetic
@@ -11,15 +12,17 @@ pub struct Traits {
     //   neurons that learn through habituation,
     //   sensitization, or Hebbian-type processes
     trait_id: u32, // Used in file saving and loading
-    params: Vec<f64>, // Keep traits in an array
+    traits: Vec<f64>, // Keep traits in an array
+    params: Params,
 }
 
 impl Traits {
     /// construct new Traits
-    pub fn new(id: u32, params: Vec<f64>) -> Traits {
+    pub fn new(id: u32, traits: Vec<f64>) -> Traits {
         Traits {
             trait_id: id,
-            params: params,
+            traits: traits,
+            params: Params::default(),
         }
     }
     /// Getter
@@ -27,15 +30,12 @@ impl Traits {
         self.trait_id
     }
     /// Mutate this trait
-    pub fn mutate(&mut self, probability: f64, mutation_power: f64) {
-        self.params.iter_mut().map(|&mut x| {
-            let float = rand::random::<f64>();
-            if float > probability {
-                let posneg = if rand::random::<bool>() { -1f64 } else { 1f64 };
-                posneg * float * mutation_power
-            } else {
-                x
-            }
+    pub fn mutate(&mut self) {
+        let prob = self.params.trait_mutate_prob();
+        let power = self.params.trait_mutation_power();
+        self.traits.iter_mut().map(|&mut x| {
+            let float = super::rand_float();
+            if float > prob { float * power } else { x }
         });
     }
     /// Create this Traits from two traits passed in
@@ -43,11 +43,12 @@ impl Traits {
     pub fn from_existing(trait1: Traits, trait2: Traits) -> Traits {
         Traits {
             trait_id: trait1.trait_id,
-            params: trait1.params
+            traits: trait1.traits
                 .iter()
-                .zip(trait2.params.iter())
+                .zip(trait2.traits.iter())
                 .map(|x| *x.0 + *x.1 / 2.0f64)
                 .collect::<Vec<f64>>(),
+            params: Params::default(),
         }
 
     }

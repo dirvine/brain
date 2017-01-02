@@ -1,33 +1,58 @@
 use std::time::Duration;
 
-#[derive(Clone, Copy)]
+#[derive(PartialOrd, PartialEq, Clone, Copy)]
 pub struct Params {
     population_size: u32,
     time_alive_min: Duration,
     compat_threshold: f64,
+    trait_mutate_prob: f64,
+    trait_mutation_power: f64,
+    survival_threshold: f64,
+    mutate_only_prob: f64,
 }
 
-
-impl Params {
-    /// Initialise all defauts
-    pub fn new() -> Params {
+impl Default for Params {
+    fn default() -> Self {
         Params {
             population_size: 150,
             time_alive_min: Duration::from_millis(10),
             compat_threshold: 3.3,
+            trait_mutate_prob: 0.2,
+            trait_mutation_power: 1.5,
+            survival_threshold: 1.5,
+            mutate_only_prob: 0.02,
         }
     }
+}
+
+impl Params {
     /// Getter
-    pub fn population_size(&self) -> u32 {
-        self.population_size
+    pub fn population_size(&self) -> &u32 {
+        &self.population_size
     }
     /// Getter
-    pub fn time_alive_min(&self) -> Duration {
-        self.time_alive_min
+    pub fn time_alive_min(&self) -> &Duration {
+        &self.time_alive_min
     }
     /// Getter
-    pub fn compat_threshold(&self) -> f64 {
-        self.compat_threshold
+    pub fn compat_threshold(&self) -> &f64 {
+        &self.compat_threshold
+    }
+    /// Getter
+    pub fn trait_mutate_prob(&self) -> f64 {
+        self.trait_mutate_prob
+    }
+    /// Getter
+    pub fn trait_mutation_power(&self) -> f64 {
+        self.trait_mutation_power
+    }
+    /// Getter
+    pub fn survival_threshold(&self) -> &f64 {
+        &self.survival_threshold
+    }
+    /// Getter
+    pub fn mutate_only_prob(&self) -> &f64 {
+        &self.mutate_only_prob
     }
 }
 
