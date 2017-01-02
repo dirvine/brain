@@ -39,12 +39,12 @@ impl Params {
         &self.compat_threshold
     }
     /// Getter
-    pub fn trait_mutate_prob(&self) -> f64 {
-        self.trait_mutate_prob
+    pub fn trait_mutate_prob(&self) -> &f64 {
+        &self.trait_mutate_prob
     }
     /// Getter
-    pub fn trait_mutation_power(&self) -> f64 {
-        self.trait_mutation_power
+    pub fn trait_mutation_power(&self) -> &f64 {
+        &self.trait_mutation_power
     }
     /// Getter
     pub fn survival_threshold(&self) -> &f64 {

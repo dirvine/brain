@@ -35,7 +35,7 @@ impl Traits {
         let power = self.params.trait_mutation_power();
         self.traits.iter_mut().map(|&mut x| {
             let float = super::rand_float();
-            if float > prob { float * power } else { x }
+            if float > *prob { float * *power } else { x }
         });
     }
     /// Create this Traits from two traits passed in
