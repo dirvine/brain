@@ -1,10 +1,10 @@
 use genome::Genome;
-use std::rc::Rc;
+use network_node::NodeType;
 
 /// A NETWORK is a LIST of input NODEs and a LIST of output NODEs
 ///   The point of the network is to define a single entity which can evolve
 ///   or learn on its own, even though it may be part of a larger framework
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Network {
     genotype: Genome, // Allows Network to be matched with its Genome
     name: String, // Every Network or subNetwork can have a name
@@ -24,342 +24,172 @@ impl Network {
     }
     /// All inout nodes
     pub fn num_inputs(&self) -> usize {
-        unimplemented!()
-        // self.genotype.num_inputs()
+        self.genotype.num_inputs()
     }
-    // /// Add an input Neuron - connect to any existing outputs
-    // pub fn add_input_neuron(&mut self, neuron: NeuronGene) {
-    //     neuron.set_type(NeuronType::Sensor(default::Default));
-    //     self.neuron_genes.push(neuron)
-    // }
-    // /// Add an input Neuron - connect to any existing sensors
-    // pub fn add_output_neuron(&mut self, neuron: NeuronGene) {
-    //     neuron.set_type(NeuronType::Output);
-    //     self.neuron_genes.push(neuron)
-    // }
-    //
-    // /// If all output are not active then return true
-    // pub fn are_outputs_off(&self) -> bool {
-    //     self.genotype
-    //         .neuron_genes()
-    //         .iter()
-    //         .filter(|x| x.gen_node_label == NeuronPlace::Out && x.active())
-    //         .count() > 0
-    // }
+    /// All output nodes
+    pub fn num_outputs(&self) -> usize {
+        self.genotype.num_outputs()
+    }
+    /// Puts the network back into an initial state
+    fn flush(&mut self) {
+        unimplemented!()
+        // self.outputs().iter().map(|x| x.flushback());
+    }
+
+    /// If all output are not active then return true
+    fn outputsoff(&mut self) -> bool {
+        self.genotype.outputs_off()
+    }
+
+    /// Print the connections weights to a file separated by only carriage returns
+    pub fn print_links(&self) {
+        self.genotype.network_nodes.iter().map(|x| {
+            // TODO
+            if *x.borrow().node_type() != NodeType::Sensor {
+                println!("In node Id: {:?} Out node Id {:?} Link weight {:?}",
+                         x.borrow().node_id(),
+                         x.borrow().node_id(),
+                         24)
+            }
+        });
+
+    }
+
+    /// Activates the net such that all outputs are active
+    /// Returns true on success;
+    pub fn activate(&mut self) {
+        println!("Activating network ");
+
+        let mut abortcount = 0;  //Used in case the output is somehow truncated from the network
+
+        // Keep activating until all the outputs have become active
+        // This only happens on the first activation, because after that they
+        // are always active)
+
+        if self.outputsoff() {
+            abortcount += 1;
+            if abortcount == 20 {
+                println!("Inputs disconnected from output!");
+                return;
+            }
+            println!("Outputs are off");
+
+            // For each node, compute the sum of its incoming activation
+            for mut node in self.genotype
+                .network_nodes
+                .iter_mut()
+                .filter(|x| *x.borrow().node_type() != NodeType::Sensor) {
+                node.borrow_mut().add_active_sum(0.0);
+                node.borrow_mut().set_active_flag(false);
+                // For each incoming connection, add the activity from the connection to the activesum
+                for mut link in node.borrow_mut().incoming_mut().iter() {
+                    // Handle time delays
+                    if !link.borrow_mut().time_delay() {
+                        let add = link.borrow_mut().weight().0 *
+                                  link.borrow().inode().borrow().activation();
+                        if link.borrow().inode().borrow().active_flag() ||
+                           *link.borrow().inode().borrow().node_type() == NodeType::Sensor {
+                            node.borrow_mut().set_active_flag(true);
+                            node.borrow_mut().add_active_sum(add);
+                        }
+                    } else {
+
+                        let add = link.borrow().weight().0 *
+                                  link.borrow().inode().borrow().active_out_time_delay();
+                        node.borrow_mut().add_active_sum(add);
+                    }
+
+                }
+            }
+
+            // Now activate all the non-sensor nodes off their incoming activation
+            for mut node in self.genotype.network_nodes.iter_mut().filter(|x| *x.borrow().node_type() != NodeType::Sensor && x.borrow().active_flag()) {
+				//Only activate if some active input came in
+					//"Activating "node_id" with "<<(*curnode)->activesum<<": ";
+
+					//Keep a memory of activations for potential time delayed connections
+					node.borrow_mut().set_penultimate_activation(node.borrow().last_activation());
+					node.borrow_mut().set_last_activation(node.borrow().activation());
+
+					//If the node is being overrided from outside,
+					//stick in the override value
+					if node.borrow().overridden() {
+						//Set activation to the override value and turn off override
+						node.borrow_mut().activate_override();
+					}
+					else {
+						//Now run the net activation through an activation function
+                        node.borrow_mut().set_activation(super::sigmoid(node.borrow().activation(), 4.924273));
+					}
+					//cout<<(*curnode)->activation<<endl;
+
+					//Increment the activation_count
+					//First activation cannot be from nothing!!
+					node.borrow_mut().increment_activation_count();
+		}
+
+        }
+
+        if self.adaptable {
+            println!("ADAPTING");
+            // ADAPTATION:  Adapt weights based on activations
+            for mut node in self.genotype
+                .network_nodes
+                .iter()
+                .filter(|x| *x.borrow().node_type() != NodeType::Sensor) {
+                // cout<<"On node "<<(*curnode)->node_id<<endl;
+
+                // For each incoming connection, perform adaptation based on the trait of the connection
+                for mut link in node.borrow_mut().incoming().iter() {
+                    if link.borrow().trait_id() == 2 || link.borrow().trait_id() == 3 ||
+                       link.borrow().trait_id() == 4 {
+
+                        // In the recurrent case we must take the last activation of the input for calculating hebbian changes
+                        if link.borrow().recur() {
+                            link.borrow_mut()
+                                .set_weight(super::hebbian(link.borrow().weight().0,
+                                                           self.maxweight,
+                                                           link.borrow()
+                                                               .inode()
+                                                               .borrow()
+                                                               .last_activation(),
+                                                           link.borrow()
+                                                               .onode()
+                                                               .borrow()
+                                                               .activation(), // FIXME active_out
+                                                           link.borrow_mut().trait_params()[0],
+                                                           link.borrow_mut().trait_params()[1],
+                                                           link.borrow_mut().trait_params()[2]));
+
+
+                        } else {
+                            // non-recurrent case
+                            link.borrow_mut()
+                                .set_weight(super::hebbian(link.borrow().weight().0,
+                                                           self.maxweight,
+                                                           link.borrow()
+                                                               .inode()
+                                                               .borrow()
+                                                               .activation(),
+                                                           link.borrow()
+                                                               .onode()
+                                                               .borrow()
+                                                               .activation(), // FIXE active_out
+                                                           link.borrow_mut().trait_params()[0],
+                                                           link.borrow_mut().trait_params()[1],
+                                                           link.borrow_mut().trait_params()[2]));
+                        }
+                    }
+
+                }
+
+
+            }
+
+        }
+
+    }
 }
-
-// // This constructor allows the input and output lists to be supplied
-// // Defaults to not using adaptation
-// Network(std::vector<NNode*> in,std::vector<NNode*> out,std::vector<NNode*> all,int netid);
-//
-// //Same as previous constructor except the adaptibility can be set true or false with adaptval
-// Network(std::vector<NNode*> in,std::vector<NNode*> out,std::vector<NNode*> all,int netid, bool adaptval);
-//
-// // This constructs a net with empty input and output lists
-// Network(int netid);
-//
-// //Same as previous constructor except the adaptibility can be set true or false with adaptval
-// Network(int netid, bool adaptval);
-//
-// // Copy Constructor
-// Network(const Network& network);
-//
-// ~Network();
-//
-// // Puts the network back into an inactive state
-// void flush();
-//
-// // Verify flushedness for debugging
-// void flush_check();
-//
-// // Activates the net such that all outputs are active
-// bool activate();
-//
-// // Prints the values of its outputs
-// void show_activation();
-//
-// void show_input();
-//
-// // Add a new input node
-// void add_input(NNode*);
-//
-// // Add a new output node
-// void add_output(NNode*);
-//
-// // Takes an array of sensor values and loads it into SENSOR inputs ONLY
-// void load_sensors(double*);
-// void load_sensors(const std::vector<float> &sensvals);
-//
-// // Takes and array of output activations and OVERRIDES the outputs' actual
-// // activations with these values (for adaptation)
-// void override_outputs(double*);
-//
-// // Name the network
-// void give_name(char*);
-//
-// // Counts the number of nodes in the net if not yet counted
-// int nodecount();
-//
-// // Counts the number of links in the net if not yet counted
-// int linkcount();
-//
-// // This checks a POTENTIAL link between a potential in_node
-// // and potential out_node to see if it must be recurrent
-// // Use count and thresh to jump out in the case of an infinite loop
-// bool is_recur(NNode *potin_node,NNode *potout_node,int &count,int thresh);
-//
-// // Some functions to help GUILE input into Networks
-// int input_start();
-// int load_in(double d);
-//
-// // If all output are not active then return true
-// bool outputsoff();
-//
-// // Just print connections weights with carriage returns
-// void print_links_tofile(char *filename);
-//
-// int max_depth();
-//
-// bool is_rec_helper(NNode* curnode, NNode* find_node,std::vector<NNode*> &seenlist);
-// bool is_recur2(NNode *potin_node,NNode *potout_node,int &count, int thresh);
-
-
-// Network::Network(std::vector<NNode*> in,std::vector<NNode*> out,std::vector<NNode*> all,int netid) {
-//   inputs=in;
-//   outputs=out;
-//   all_nodes=all;
-//   name=0;   //Defaults to no name  ..NOTE: TRYING TO PRINT AN EMPTY NAME CAN CAUSE A CRASH
-//   numnodes=-1;
-//   numlinks=-1;
-//   net_id=netid;
-//   adaptable=false;
-// }
-//
-// Network::Network(std::vector<NNode*> in,std::vector<NNode*> out,std::vector<NNode*> all,int netid, bool adaptval) {
-//   inputs=in;
-//   outputs=out;
-//   all_nodes=all;
-//   name=0;   //Defaults to no name  ..NOTE: TRYING TO PRINT AN EMPTY NAME CAN CAUSE A CRASH
-//   numnodes=-1;
-//   numlinks=-1;
-//   net_id=netid;
-//   adaptable=adaptval;
-// }
-//
-//
-// Network::Network(int netid) {
-// 			name=0; //Defaults to no name
-// 			numnodes=-1;
-// 			numlinks=-1;
-// 			net_id=netid;
-// 			adaptable=false;
-// 		}
-//
-// Network::Network(int netid, bool adaptval) {
-//   name=0; //Defaults to no name
-//   numnodes=-1;
-//   numlinks=-1;
-//   net_id=netid;
-//   adaptable=adaptval;
-// }
-//
-//
-//
-// // Puts the network back into an initial state
-// void Network::flush() {
-// 	std::vector<NNode*>::iterator curnode;
-//
-// 	for(curnode=outputs.begin();curnode!=outputs.end();++curnode) {
-// 		(*curnode)->flushback();
-// 	}
-// }
-//
-// // Debugger: Checks network state
-// void Network::flush_check() {
-// 	std::vector<NNode*>::iterator curnode;
-// 	std::vector<NNode*>::iterator location;
-// 	std::vector<NNode*> seenlist;  //List of nodes not to doublecount
-//
-// 	for(curnode=outputs.begin();curnode!=outputs.end();++curnode) {
-//         location= std::find(seenlist.begin(),seenlist.end(),(*curnode));
-// 		if (location==seenlist.end()) {
-// 			seenlist.push_back(*curnode);
-// 			(*curnode)->flushback_check(seenlist);
-// 		}
-// 	}
-// }
-//
-//
-// // Print the connections weights to a file separated by only carriage returns
-// void Network::print_links_tofile(char *filename) {
-// 	std::vector<NNode*>::iterator curnode;
-// 	std::vector<Link*>::iterator curlink;
-//
-//     std::ofstream oFile(filename);
-//
-// 	//Make sure it worked
-// 	//if (!oFile) {
-// 	//	cerr<<"Can't open "<<filename<<" for output"<<endl;
-// 		//return 0;
-// 	//}
-//
-// 	for(curnode=all_nodes.begin();curnode!=all_nodes.end();++curnode) {
-// 		if (((*curnode)->type)!=SENSOR) {
-// 			for(curlink=((*curnode)->incoming).begin(); curlink!=((*curnode)->incoming).end(); ++curlink) {
-//                 oFile << (*curlink)->in_node->node_id << " -> " <<( *curlink)->out_node->node_id << " : " << (*curlink)->weight << std::endl;
-// 			} // end for loop on links
-// 		} //end if
-// 	} //end for loop on nodes
-//
-// 	oFile.close();
-//
-// } //print_links_tofile
-//
-// // Activates the net such that all outputs are active
-// // Returns true on success;
-// bool Network::activate() {
-// 	std::vector<NNode*>::iterator curnode;
-// 	std::vector<Link*>::iterator curlink;
-// 	double add_amount;  //For adding to the activesum
-// 	bool onetime; //Make sure we at least activate once
-// 	int abortcount=0;  //Used in case the output is somehow truncated from the network
-//
-// 	//cout<<"Activating network: "<<this->genotype<<endl;
-//
-// 	//Keep activating until all the outputs have become active
-// 	//(This only happens on the first activation, because after that they
-// 	// are always active)
-//
-// 	onetime=false;
-//
-// 	while(outputsoff()||!onetime) {
-//
-// 		++abortcount;
-//
-// 		if (abortcount==20) {
-// 			return false;
-// 			//cout<<"Inputs disconnected from output!"<<endl;
-// 		}
-// 		//std::cout<<"Outputs are off"<<std::endl;
-//
-// 		// For each node, compute the sum of its incoming activation
-// 		for(curnode=all_nodes.begin();curnode!=all_nodes.end();++curnode) {
-// 			//Ignore SENSORS
-//
-// 			//cout<<"On node "<<(*curnode)->node_id<<endl;
-//
-// 			if (((*curnode)->type)!=SENSOR) {
-// 				(*curnode)->activesum=0;
-// 				(*curnode)->active_flag=false;  //This will tell us if it has any active inputs
-//
-// 				// For each incoming connection, add the activity from the connection to the activesum
-// 				for(curlink=((*curnode)->incoming).begin();curlink!=((*curnode)->incoming).end();++curlink) {
-// 					//Handle possible time delays
-// 					if (!((*curlink)->time_delay)) {
-// 						add_amount=((*curlink)->weight)*(((*curlink)->in_node)->get_active_out());
-// 						if ((((*curlink)->in_node)->active_flag)||
-// 							(((*curlink)->in_node)->type==SENSOR)) (*curnode)->active_flag=true;
-// 						(*curnode)->activesum+=add_amount;
-// 						//std::cout<<"Node "<<(*curnode)->node_id<<" adding "<<add_amount<<" from node "<<((*curlink)->in_node)->node_id<<std::endl;
-// 					}
-// 					else {
-// 						//Input over a time delayed connection
-// 						add_amount=((*curlink)->weight)*(((*curlink)->in_node)->get_active_out_td());
-// 						(*curnode)->activesum+=add_amount;
-// 					}
-//
-// 				} //End for over incoming links
-//
-// 			} //End if (((*curnode)->type)!=SENSOR)
-//
-// 		} //End for over all nodes
-//
-// 		// Now activate all the non-sensor nodes off their incoming activation
-// 		for(curnode=all_nodes.begin();curnode!=all_nodes.end();++curnode) {
-//
-// 			if (((*curnode)->type)!=SENSOR) {
-// 				//Only activate if some active input came in
-// 				if ((*curnode)->active_flag) {
-// 					//cout<<"Activating "<<(*curnode)->node_id<<" with "<<(*curnode)->activesum<<": ";
-//
-// 					//Keep a memory of activations for potential time delayed connections
-// 					(*curnode)->last_activation2=(*curnode)->last_activation;
-// 					(*curnode)->last_activation=(*curnode)->activation;
-//
-// 					//If the node is being overrided from outside,
-// 					//stick in the override value
-// 					if ((*curnode)->overridden()) {
-// 						//Set activation to the override value and turn off override
-// 						(*curnode)->activate_override();
-// 					}
-// 					else {
-// 						//Now run the net activation through an activation function
-// 						if ((*curnode)->ftype==SIGMOID)
-// 							(*curnode)->activation=NEAT::fsigmoid((*curnode)->activesum,4.924273,2.4621365);  //Sigmoidal activation- see comments under fsigmoid
-// 					}
-// 					//cout<<(*curnode)->activation<<endl;
-//
-// 					//Increment the activation_count
-// 					//First activation cannot be from nothing!!
-// 					(*curnode)->activation_count++;
-// 				}
-// 			}
-// 		}
-//
-// 		onetime=true;
-// 	}
-//
-// 	if (adaptable) {
-//
-// 	  //std::cout << "ADAPTING" << std:endl;
-//
-// 	  // ADAPTATION:  Adapt weights based on activations
-// 	  for(curnode=all_nodes.begin();curnode!=all_nodes.end();++curnode) {
-// 	    //Ignore SENSORS
-//
-// 	    //cout<<"On node "<<(*curnode)->node_id<<endl;
-//
-// 	    if (((*curnode)->type)!=SENSOR) {
-//
-// 	      // For each incoming connection, perform adaptation based on the trait of the connection
-// 	      for(curlink=((*curnode)->incoming).begin();curlink!=((*curnode)->incoming).end();++curlink) {
-//
-// 		if (((*curlink)->trait_id==2)||
-// 		    ((*curlink)->trait_id==3)||
-// 		    ((*curlink)->trait_id==4)) {
-//
-// 		  //In the recurrent case we must take the last activation of the input for calculating hebbian changes
-// 		  if ((*curlink)->is_recurrent) {
-// 		    (*curlink)->weight=
-// 		      hebbian((*curlink)->weight,maxweight,
-// 			      (*curlink)->in_node->last_activation,
-// 			      (*curlink)->out_node->get_active_out(),
-// 			      (*curlink)->params[0],(*curlink)->params[1],
-// 			      (*curlink)->params[2]);
-//
-//
-// 		  }
-// 		  else { //non-recurrent case
-// 		    (*curlink)->weight=
-// 		      hebbian((*curlink)->weight,maxweight,
-// 			      (*curlink)->in_node->get_active_out(),
-// 			      (*curlink)->out_node->get_active_out(),
-// 			      (*curlink)->params[0],(*curlink)->params[1],
-// 			      (*curlink)->params[2]);
-// 		  }
-// 		}
-//
-// 	      }
-//
-// 	    }
-//
-// 	  }
-//
-// 	} //end if (adaptable)
-//
-// 	return true;
-// }
-//
 // // Prints the values of its outputs
 // void Network::show_activation() {
 // 	std::vector<NNode*>::iterator curnode;
@@ -721,4 +551,6 @@ impl Network {
 //   return max;
 //
 // }
+// }
+//
 //

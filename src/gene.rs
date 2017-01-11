@@ -18,8 +18,8 @@ pub struct Gene {
 
 impl Gene {
     /// Construct a gene
-    pub fn new_no_trait(onode: RefCell<NetworkNode>,
-                        inode: RefCell<NetworkNode>,
+    pub fn new_no_trait(onode: Rc<RefCell<NetworkNode>>,
+                        inode: Rc<RefCell<NetworkNode>>,
                         link_trait: Traits,
                         link_weight: Weight,
                         innov: u64,
@@ -36,8 +36,8 @@ impl Gene {
     }
 
     /// Construct a gene off of another gene as a duplicate
-    pub fn new_use_existing_gene(onode: RefCell<NetworkNode>,
-                                 inode: RefCell<NetworkNode>,
+    pub fn new_use_existing_gene(onode: Rc<RefCell<NetworkNode>>,
+                                 inode: Rc<RefCell<NetworkNode>>,
                                  gene: &Gene,
                                  link_trait: Traits,
                                  recur: bool)
@@ -58,8 +58,7 @@ impl Gene {
 
     /// Set link trait
     pub fn set_link_trait(&mut self, traits: Traits) {
-        unimplemented!()
-        // self.lnk.set_trait(traits);
+        self.lnk.borrow_mut().set_trait(traits);
     }
     /// Getter
     pub fn innovation_num(&self) -> u64 {

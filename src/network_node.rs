@@ -6,6 +6,7 @@ use std::sync::{Arc, Mutex};
 use traits::Traits;
 
 /// Node types
+#[allow(missing_docs)]
 #[derive(PartialEq, PartialOrd, Clone)]
 pub enum NodeType {
     Sensor,
@@ -42,6 +43,7 @@ enum ActivationFunction {
 #[derive(Clone)]
 pub struct NetworkNode {
     innovation: u64,
+    node_id: u64,
     activation_count: u32, // keeps track of which activation the node is currently in
     last_activation: f64, // Holds the previous step's activation for recurrency
     penultimate_activation: f64, // Holds the activation BEFORE the prevous step's
@@ -59,7 +61,7 @@ pub struct NetworkNode {
     frozen: bool, // When frozen, cannot be mutated (meaning its trait pointer is fixed)
     activation_function: ActivationFunction, // type is either SIGMOID ..or others that can be added
     nodetype: NodeType,
-    activesum: f64, // The incoming activity before being processed
+    active_sum: f64, // The incoming activity before being processed
     activation: f64, // The total activation entering the NNode
     active_flag: bool, // To make sure outputs are active
     // ************ LEARNING PARAMETERS ***********
@@ -76,6 +78,58 @@ impl NetworkNode {
     /// Getter
     pub fn node_type(&self) -> &NodeType {
         &self.nodetype
+    }
+    /// Getter
+    pub fn node_id(&self) -> u64 {
+        self.node_id
+    }
+    /// Getter
+    pub fn activation_count(&self) -> u32 {
+        self.activation_count
+    }
+    /// Setter
+    pub fn increment_activation_count(&mut self) {
+        self.activation_count += 1;
+    }
+    /// Getter
+    pub fn active_out_time_delay(&self) -> f64 {
+        self.penultimate_activation
+    }
+    /// Setter
+    pub fn add_active_sum(&mut self, sum: f64) {
+        self.active_sum += sum;
+    }
+    /// Setter
+    pub fn set_last_activation(&mut self, sum: f64) {
+        self.last_activation = sum;
+    }
+    /// Setter
+    pub fn set_activation(&mut self, sum: f64) {
+        self.activation = sum;
+    }
+    /// Setter
+    pub fn set_penultimate_activation(&mut self, sum: f64) {
+        self.penultimate_activation = sum;
+    }
+    /// Getter
+    pub fn active_flag(&self) -> bool {
+        self.active_flag
+    }
+    /// Setter
+    pub fn set_active_flag(&mut self, flag: bool) {
+        self.active_flag = flag;
+    }
+    /// Setter
+    pub fn set_active_sum(&mut self, flag: bool) {
+        self.active_flag = flag;
+    }
+    /// Getter
+    pub fn incoming(&self) -> &Vec<RefCell<Link>> {
+        &self.incoming
+    }
+    /// Getter
+    pub fn incoming_mut(&mut self) -> &Vec<RefCell<Link>> {
+        &self.incoming
     }
     /// Set link trait
     pub fn set_node_trait(&mut self, traits: Traits) {
@@ -152,7 +206,7 @@ impl NetworkNode {
         self.activation
     }
     /// Getter
-    pub fn last_Activation(&self) -> f64 {
+    pub fn last_activation(&self) -> f64 {
         self.last_activation
     }
     /// Getter
@@ -170,7 +224,8 @@ impl NetworkNode {
         }
         self.incoming.iter_mut().map(|ref mut link| {
             link.borrow_mut().set_added_weight(0f64);
-            // TODO link.borrow().inode().borrow_mut().flush_back();
+            // TODO recurse here
+            // link.borrow().inode().clone().borrow_mut().flush_back();
         });
     }
     /// The Gene that created this node

@@ -22,7 +22,7 @@ impl Traits {
         Traits {
             trait_id: id,
             traits: traits,
-            params: Params::default(),
+            params: Default::default(),
         }
     }
     /// Getter

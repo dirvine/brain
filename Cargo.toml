@@ -3,6 +3,9 @@ authors = ["David Irvine <david.irvine@maidsafe.net>"]
 name = "neuroevolution"
 version = "0.0.1"
 
+[lib]
+crate-type = ["staticlib"]
+
 [dependencies]
 crossbeam = "~0.2.10"
 log = "0.3.6"

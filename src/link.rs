@@ -8,14 +8,17 @@ use traits::Traits;
 use weight::Weight;
 
 
+/// A link is similar to a synapse, it carries weight which can be mutated. It's held by a
+/// `Gene` which holds the amount of mutation.
 #[derive(Clone)]
 pub struct Link {
-    onode: RefCell<NetworkNode>,
-    inode: RefCell<NetworkNode>,
+    onode: Rc<RefCell<NetworkNode>>,
+    inode: Rc<RefCell<NetworkNode>>,
     weight: Weight,
     added_weight: f64,
     time_delay: bool,
     link_trait: Option<Traits>,
+    trait_params: [f64; 8], // FIXME
     trait_id: u32,
     innovation: u64,
     recur: bool,
@@ -23,8 +26,8 @@ pub struct Link {
 
 impl Link {
     /// Create a new synapse
-    pub fn new(onode: RefCell<NetworkNode>,
-               inode: RefCell<NetworkNode>,
+    pub fn new(onode: Rc<RefCell<NetworkNode>>,
+               inode: Rc<RefCell<NetworkNode>>,
                link_trait: Traits,
                weight: Weight,
                innovation: u64,
@@ -37,14 +40,15 @@ impl Link {
             added_weight: 0f64,
             time_delay: false,
             trait_id: link_trait.trait_id(),
+            trait_params: [0.0; 8],
             link_trait: Some(link_trait),
             innovation: innovation,
             recur: recur,
         }
     }
     /// Create a new synapse with no link trait
-    pub fn new_without_trait(onode: RefCell<NetworkNode>,
-                             inode: RefCell<NetworkNode>,
+    pub fn new_without_trait(onode: Rc<RefCell<NetworkNode>>,
+                             inode: Rc<RefCell<NetworkNode>>,
                              weight: Weight,
                              innovation: u64,
                              recur: bool)
@@ -56,12 +60,21 @@ impl Link {
             added_weight: 0f64,
             time_delay: false,
             link_trait: None,
+            trait_params: [0.0; 8],
             trait_id: 1,
             innovation: innovation,
             recur: recur,
         }
     }
 
+    /// Getter
+    pub fn onode(&self) -> Rc<RefCell<NetworkNode>> {
+        self.onode.clone()
+    }
+    /// Getter
+    pub fn inode(&self) -> Rc<RefCell<NetworkNode>> {
+        self.inode.clone()
+    }
     /// Set link trait
     pub fn set_trait(&mut self, traits: Traits) {
         self.link_trait = Some(traits);
@@ -73,6 +86,16 @@ impl Link {
     }
 
     /// Getter
+    pub fn trait_params(&mut self) -> &[f64] {
+        &self.trait_params
+    }
+
+    /// Getter
+    pub fn trait_id(&self) -> u32 {
+        self.trait_id
+    }
+
+    /// Getter
     pub fn looped_recurrent(&self) -> bool {
         self.onode.borrow().innovation() == self.inode.borrow().innovation()
     }
@@ -81,13 +104,21 @@ impl Link {
     pub fn weight(&self) -> Weight {
         self.weight
     }
+    /// Setter
+    pub fn set_weight(&mut self, weight: f64) {
+        self.weight = Weight(weight);
+    }
+    /// Getter
+    pub fn time_delay(&self) -> bool {
+        self.time_delay
+    }
+    /// Setter
+    pub fn set_time_delay(&mut self, delay: bool) {
+        self.time_delay = delay;
+    }
     /// Getter
     pub fn recur(&self) -> bool {
         self.recur
-    }
-    /// Getter
-    pub fn inode(&mut self) -> RefCell<NetworkNode> {
-        self.inode.clone()
     }
     /// Setter
     pub fn set_added_weight(&mut self, w: f64) {
