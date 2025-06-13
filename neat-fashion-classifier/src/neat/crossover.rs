@@ -4,7 +4,7 @@
 //! to NEAT's genetic algorithm. NEAT uses historical markings to enable meaningful
 //! crossover between genomes with different topologies.
 
-use crate::neat::genome::{Genome, NodeGene, ConnectionGene, NodeType, ActivationType};
+use crate::neat::genome::{Genome, NodeGene, ConnectionGene};
 use crate::neat::innovation::InnovationTracker;
 use crate::config::NEATConfig;
 use crate::error::Result;
@@ -122,7 +122,7 @@ impl NEATCrossover {
         // Find min and max innovation IDs for each parent
         let p1_max = p1_connections.keys().max().copied().unwrap_or(0);
         let p2_max = p2_connections.keys().max().copied().unwrap_or(0);
-        let overall_max = p1_max.max(p2_max);
+        let _overall_max = p1_max.max(p2_max);
         
         let mut matching_connections = Vec::new();
         let mut disjoint_connections = Vec::new();
@@ -343,6 +343,7 @@ struct GeneAlignment {
 /// A connection gene that exists in both parents
 #[derive(Debug, Clone)]
 struct MatchingConnection {
+    #[allow(dead_code)]
     innovation_id: usize,
     parent1_gene: ConnectionGene,
     parent2_gene: ConnectionGene,
@@ -351,6 +352,7 @@ struct MatchingConnection {
 /// A connection gene that exists in only one parent (disjoint)
 #[derive(Debug, Clone)]
 struct DisjointConnection {
+    #[allow(dead_code)]
     innovation_id: usize,
     gene: ConnectionGene,
     parent: usize, // 1 or 2
@@ -359,6 +361,7 @@ struct DisjointConnection {
 /// A connection gene that exists beyond the other parent's range (excess)
 #[derive(Debug, Clone)]
 struct ExcessConnection {
+    #[allow(dead_code)]
     innovation_id: usize,
     gene: ConnectionGene,
     parent: usize, // 1 or 2
@@ -367,6 +370,7 @@ struct ExcessConnection {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::neat::genome::{NodeType, ActivationType};
     use crate::neat::innovation::InnovationTracker;
     use rand::{SeedableRng, rngs::SmallRng};
 

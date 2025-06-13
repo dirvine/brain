@@ -36,6 +36,7 @@ chrono = { version = "0.4", features = ["serde"] }
 # Data handling (optional for future HuggingFace integration)
 hf-hub = { version = "0.3", optional = true }
 image = { version = "0.24", optional = true }
+flate2 = "1.0"
 
 # CLI support (optional)
 clap = { version = "4.0", features = ["derive"], optional = true }

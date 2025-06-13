@@ -31,6 +31,7 @@ pub struct Network {
 #[derive(Debug, Clone)]
 struct NodeInfo {
     /// Node type
+    #[allow(dead_code)]
     node_type: NodeType,
     /// Activation function
     activation: ActivationType,

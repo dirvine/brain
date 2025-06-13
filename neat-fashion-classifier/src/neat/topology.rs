@@ -86,7 +86,7 @@ impl TopologyAnalyzer {
     }
     
     /// Perform complete topology analysis on a network with its genome
-    pub fn analyze_network(genome: &Genome, network: &Network) -> Result<TopologyAnalysis> {
+    pub fn analyze_network(genome: &Genome, _network: &Network) -> Result<TopologyAnalysis> {
         let structure = Self::analyze_structure(genome);
         let connectivity = Self::analyze_connectivity(genome);
         let paths = Self::analyze_paths(genome);

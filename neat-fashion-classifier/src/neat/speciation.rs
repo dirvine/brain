@@ -8,7 +8,7 @@
 use crate::neat::genome::Genome;
 use crate::neat::crossover::NEATCrossover;
 use crate::config::NEATConfig;
-use crate::error::{NEATError, Result};
+use crate::error::Result;
 use std::collections::HashMap;
 // use rand::prelude::*;
 

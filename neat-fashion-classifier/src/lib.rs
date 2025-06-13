@@ -37,6 +37,7 @@
 
 pub mod config;
 pub mod neat;
+pub mod dataset;
 // Temporarily disabled while fixing compilation issues
 // pub mod benchmarks;
 
