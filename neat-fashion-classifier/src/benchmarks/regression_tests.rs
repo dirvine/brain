@@ -141,6 +141,14 @@ impl FitnessEvaluator for DeterministicEvaluator {
             TestProblem::FunctionApproximation => 1,
         }
     }
+    
+    fn max_fitness(&self) -> f64 {
+        match self.problem_type {
+            TestProblem::XOR => 4.0,
+            TestProblem::SimpleClassification => 1.0,
+            TestProblem::FunctionApproximation => 1.0,
+        }
+    }
 }
 
 impl DeterministicEvaluator {
@@ -332,10 +340,11 @@ fn run_fitness_evolution_test(config: &BenchmarkConfig) -> Result<TestResult> {
                 let improvement_rate = calculate_improvement_rate(&result.stats.fitness_history);
                 improvement_rates.push(improvement_rate);
                 
+                let fitness_clone = result.stats.fitness_history.clone();
                 fitness_history.extend(result.stats.fitness_history);
                 
                 // Check for stagnation patterns
-                let stagnation = check_stagnation(&result.stats.fitness_history, test.max_stagnation_generations);
+                let stagnation = check_stagnation(&fitness_clone, test.max_stagnation_generations);
                 
                 population_snapshots.push(PopulationSnapshot {
                     generation: 0,
@@ -408,9 +417,9 @@ fn run_genetic_operator_test(config: &BenchmarkConfig) -> Result<TestResult> {
             let mut neat_config = NEATConfig::default();
             neat_config.population.size = 80;
             neat_config.population.max_generations = 30;
-            neat_config.mutation.add_node_prob = mutation_rate * 0.1;
-            neat_config.mutation.add_connection_prob = mutation_rate * 0.2;
-            neat_config.mutation.weight_mutate_prob = mutation_rate;
+            neat_config.mutation.add_node_rate = mutation_rate * 0.1;
+            neat_config.mutation.add_connection_rate = mutation_rate * 0.2;
+            neat_config.mutation.weight_mutation_rate = mutation_rate;
             
             match run_diversity_analysis(evaluator.clone(), neat_config) {
                 Ok((genetic_div, fitness_div, structural_div)) => {

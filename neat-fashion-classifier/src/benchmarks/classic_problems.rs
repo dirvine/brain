@@ -72,10 +72,10 @@ impl FitnessEvaluator for XORBenchmark {
         let mut network = Network::from_genome(genome)?;
         let mut correct = 0;
         let test_cases = [
-            (vec![0.0, 0.0], 0.0),
-            (vec![0.0, 1.0], 1.0),
-            (vec![1.0, 0.0], 1.0),
-            (vec![1.0, 1.0], 0.0),
+            (vec![0.0, 0.0], 0.0f64),
+            (vec![0.0, 1.0], 1.0f64),
+            (vec![1.0, 0.0], 1.0f64),
+            (vec![1.0, 1.0], 0.0f64),
         ];
         
         for (inputs, expected) in &test_cases {
@@ -111,6 +111,10 @@ impl FitnessEvaluator for XORBenchmark {
     fn output_size(&self) -> usize {
         1
     }
+    
+    fn max_fitness(&self) -> f64 {
+        2.0 // Base accuracy (1.0) + bonus for perfect precision (1.0)
+    }
 }
 
 impl FitnessEvaluator for DoublePoleBalancingBenchmark {
@@ -136,18 +140,22 @@ impl FitnessEvaluator for DoublePoleBalancingBenchmark {
     fn output_size(&self) -> usize {
         1 // force direction
     }
+    
+    fn max_fitness(&self) -> f64 {
+        1.0 // Perfect pole balancing
+    }
 }
 
 impl DoublePoleBalancingBenchmark {
     /// Simulate pole balancing physics
     fn simulate_pole_balancing(&self, network: &mut Network) -> Result<usize> {
         // Simplified double pole balancing simulation
-        let mut x = 0.0;           // cart position
-        let mut x_dot = 0.0;       // cart velocity
-        let mut theta1 = 0.1;      // pole 1 angle
-        let mut theta1_dot = 0.0;  // pole 1 angular velocity
-        let mut theta2 = 0.0;      // pole 2 angle
-        let mut theta2_dot = 0.0;  // pole 2 angular velocity
+        let mut x = 0.0f64;           // cart position
+        let mut x_dot = 0.0f64;       // cart velocity
+        let mut theta1 = 0.1f64;      // pole 1 angle
+        let mut theta1_dot = 0.0f64;  // pole 1 angular velocity
+        let mut theta2 = 0.0f64;      // pole 2 angle
+        let mut theta2_dot = 0.0f64;  // pole 2 angular velocity
         
         let dt = 0.02; // time step
         let pole1_length = 1.0;
@@ -158,7 +166,7 @@ impl DoublePoleBalancingBenchmark {
         
         for step in 0..self.max_time_steps {
             // Check failure conditions
-            if x.abs() > 2.4 || theta1.abs() > 0.52 || theta2.abs() > 0.52 {
+            if x.abs() > 2.4f64 || theta1.abs() > 0.52f64 || theta2.abs() > 0.52f64 {
                 return Ok(step);
             }
             
@@ -222,6 +230,10 @@ impl FitnessEvaluator for FunctionApproximationBenchmark {
     
     fn output_size(&self) -> usize {
         1
+    }
+    
+    fn max_fitness(&self) -> f64 {
+        1.0 // Perfect function approximation
     }
 }
 

@@ -99,24 +99,18 @@ pub enum BenchmarkProblem {
 }
 
 /// Simple random search implementation
-#[derive(Debug, Clone)]
 pub struct RandomSearchEvaluator {
-    pub target_evaluator: Box<dyn FitnessEvaluator>,
     pub max_complexity: NetworkComplexity,
 }
 
-/// Hill climbing implementation
-#[derive(Debug, Clone)]
+/// Hill climbing implementation  
 pub struct HillClimbingEvaluator {
-    pub target_evaluator: Box<dyn FitnessEvaluator>,
     pub step_size: f64,
 }
 
 /// Fixed topology network evaluator
-#[derive(Debug, Clone)]
 pub struct FixedNetworkEvaluator {
     pub topology: FixedTopology,
-    pub target_evaluator: Box<dyn FitnessEvaluator>,
 }
 
 /// Run all comparison tests

@@ -101,6 +101,10 @@ impl FitnessEvaluator for BenchmarkEvaluator {
     fn output_size(&self) -> usize {
         self.output_size
     }
+    
+    fn max_fitness(&self) -> f64 {
+        1.0 // Normalized fitness
+    }
 }
 
 /// Run all performance tests

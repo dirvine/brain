@@ -7,7 +7,7 @@
 use crate::neat::genome::{Genome, NodeGene, ConnectionGene, NodeType, ActivationType};
 use crate::neat::innovation::InnovationTracker;
 use crate::config::NEATConfig;
-use crate::error::{NEATError, Result};
+use crate::error::Result;
 use rand::prelude::*;
 use std::collections::{HashMap, HashSet};
 

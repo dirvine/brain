@@ -5,7 +5,7 @@
 
 use crate::neat::{Genome, Network};
 use crate::error::{NEATError, Result};
-use ndarray::{Array1, Array2};
+use ndarray::Array2;
 use std::collections::HashMap;
 
 /// Trait for evaluating genome fitness

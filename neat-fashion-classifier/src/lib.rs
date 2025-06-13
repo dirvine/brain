@@ -37,7 +37,8 @@
 
 pub mod config;
 pub mod neat;
-pub mod benchmarks;
+// Temporarily disabled while fixing compilation issues
+// pub mod benchmarks;
 
 // Re-export commonly used types
 pub use crate::config::NEATConfig;
