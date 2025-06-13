@@ -25,6 +25,12 @@ pub trait FitnessEvaluator {
     fn higher_is_better(&self) -> bool {
         true
     }
+    
+    /// Get the number of inputs expected by this evaluator
+    fn input_size(&self) -> usize;
+    
+    /// Get the number of outputs expected by this evaluator
+    fn output_size(&self) -> usize;
 }
 
 /// Classification fitness evaluator for datasets like Fashion-MNIST
@@ -295,6 +301,14 @@ impl FitnessEvaluator for ClassificationEvaluator {
         // Maximum possible fitness is the sum of all metric weights
         self.metrics.accuracy_weight + self.metrics.cross_entropy_weight + self.metrics.f1_weight
     }
+    
+    fn input_size(&self) -> usize {
+        self.inputs.ncols()
+    }
+    
+    fn output_size(&self) -> usize {
+        self.num_classes
+    }
 }
 
 /// Simple XOR fitness evaluator for testing
@@ -353,6 +367,14 @@ impl FitnessEvaluator for XORFitnessEvaluator {
     
     fn max_fitness(&self) -> f64 {
         1.0
+    }
+    
+    fn input_size(&self) -> usize {
+        2 // XOR has 2 inputs
+    }
+    
+    fn output_size(&self) -> usize {
+        1 // XOR has 1 output
     }
 }
 

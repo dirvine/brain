@@ -427,7 +427,7 @@ impl PopulationManager {
 }
 
 /// Statistics for a single generation
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct EvolutionStats {
     /// Generation number
     pub generation: usize,

@@ -12,6 +12,8 @@ pub mod topology;
 pub mod crossover;
 pub mod speciation;
 pub mod population;
+pub mod trainer;
+pub mod parallel;
 
 #[cfg(test)]
 pub mod integration_tests;
@@ -26,3 +28,5 @@ pub use topology::{TopologyAnalyzer, TopologyAnalysis};
 pub use crossover::{NEATCrossover, CrossoverContext, CrossoverResult, CrossoverStats};
 pub use speciation::{Species, SpeciesManager, SpeciationStatistics};
 pub use population::{PopulationManager, EvolutionStats, SelectionMethod};
+pub use trainer::{NEATTrainer, TrainingState, TrainingStatistics, TrainingResult, TerminationReason};
+pub use parallel::{ParallelEvaluator, ParallelPopulationProcessor, ParallelConfig, EvaluationStats};

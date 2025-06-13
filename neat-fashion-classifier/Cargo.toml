@@ -22,6 +22,7 @@ toml = "0.8"
 # Parallel processing
 rayon = "1.7"
 crossbeam = "0.8"
+num_cpus = "1.16"
 
 # Error handling and logging
 thiserror = "1.0"
