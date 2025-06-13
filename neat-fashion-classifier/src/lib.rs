@@ -37,6 +37,7 @@
 
 pub mod config;
 pub mod neat;
+pub mod benchmarks;
 
 // Re-export commonly used types
 pub use crate::config::NEATConfig;
