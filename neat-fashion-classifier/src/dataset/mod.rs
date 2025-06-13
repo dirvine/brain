@@ -10,6 +10,13 @@ use crate::neat::network::Network;
 use ndarray::{Array1, Array2};
 
 pub mod fashion_mnist;
+pub mod mathematical_datasets;
+
+// Re-export mathematical dataset types
+pub use mathematical_datasets::{
+    MathDatasetProblem, MathProblemType, GSM8KDataset, MATHDataset, 
+    MathDatasetManager, MathDatasetStatistics
+};
 
 /// Common dataset interface for NEAT training
 pub trait Dataset {

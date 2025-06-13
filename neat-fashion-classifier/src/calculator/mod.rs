@@ -12,10 +12,20 @@
 pub mod arithmetic;
 pub mod encoding;
 pub mod evaluator;
+pub mod algebra;
+pub mod algebra_encoding;
+pub mod algebra_evaluator;
+pub mod sequences;
+pub mod sequence_evaluator;
 
 pub use arithmetic::*;
 pub use encoding::*;
 pub use evaluator::*;
+pub use algebra::*;
+pub use algebra_encoding::*;
+pub use algebra_evaluator::*;
+pub use sequences::*;
+pub use sequence_evaluator::*;
 
 /// Mathematical operations that can be learned
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
