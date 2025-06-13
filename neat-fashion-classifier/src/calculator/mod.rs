@@ -17,6 +17,11 @@ pub mod algebra_encoding;
 pub mod algebra_evaluator;
 pub mod sequences;
 pub mod sequence_evaluator;
+pub mod modules;
+pub mod arithmetic_modules;
+pub mod algebra_modules;
+pub mod discovery;
+pub mod conjecture;
 
 pub use arithmetic::*;
 pub use encoding::*;
@@ -26,6 +31,11 @@ pub use algebra_encoding::*;
 pub use algebra_evaluator::*;
 pub use sequences::*;
 pub use sequence_evaluator::*;
+pub use modules::*;
+pub use arithmetic_modules::*;
+pub use algebra_modules::*;
+pub use discovery::*;
+pub use conjecture::*;
 
 /// Mathematical operations that can be learned
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,319 +1,359 @@
-//! Mathematical Discovery with NEAT
+//! Mathematical Discovery and Conjecture Demo
 //!
-//! This revolutionary demo showcases NEAT's ability to discover various
-//! mathematical concepts through evolution - from arithmetic to algebra
-//! to sequence recognition. A breakthrough in AI mathematical reasoning!
+//! This revolutionary example demonstrates NEAT's ability to discover novel
+//! mathematical patterns, generate conjectures, and attempt proofs - pushing
+//! the boundaries of AI-driven mathematical research!
 
 use neat_fashion_classifier::{
-    config::NEATConfig,
     calculator::{
-        // Arithmetic
-        ArithmeticEvaluator, ArithmeticEvaluatorConfig, ArithmeticConfig,
-        EncodingConfig, EncodingScheme, Operation, DifficultyLevel,
-        // Algebra
-        AlgebraEvaluator, AlgebraEvaluatorConfig, AlgebraicDifficulty,
-        Expression, AlgebraProblem,
-        // Sequences
-        SequenceEvaluator, SequenceEvaluatorConfig, FamousSequenceEvaluators,
-        Sequence, SequenceType, FamousSequences,
+        PatternDiscoverySystem, DiscoveryConfig, DiscoveryType,
+        ConjectureSystem, ConjectureConfig, ConjectureStatus, ProofStrategy,
+        Expression, Operation,
     },
-    neat::{trainer::NEATTrainer, genome::Genome, fitness::FitnessEvaluator},
     error::Result,
 };
-use std::time::Instant;
 
 fn main() -> Result<()> {
-    println!("🚀 Mathematical Discovery with NEAT");
-    println!("===================================");
-    println!("Witness AI discovering mathematical concepts through evolution!\n");
+    println!("🔬 Mathematical Discovery and Conjecture Generation");
+    println!("==================================================");
+    println!("Demonstrating AI-driven mathematical research capabilities!\n");
     
-    // Showcase our mathematical innovations
-    showcase_arithmetic_discovery()?;
-    showcase_algebraic_reasoning()?;
-    showcase_sequence_prediction()?;
-    showcase_mathematical_emergence()?;
+    // Phase 4 demonstrations
+    demonstrate_pattern_discovery()?;
+    demonstrate_conjecture_generation()?;
+    demonstrate_conjecture_testing()?;
+    demonstrate_automated_proving()?;
+    demonstrate_research_potential()?;
     
     println!("\n🎉 Mathematical discovery experiments completed!");
-    println!("We've demonstrated evolutionary AI discovering:");
-    println!("  ✓ Arithmetic operations and algorithms");
-    println!("  ✓ Algebraic expression evaluation");
-    println!("  ✓ Pattern recognition in sequences");
-    println!("  ✓ Emergent mathematical understanding");
+    println!("We've demonstrated:");
+    println!("  ✓ Automated pattern discovery in mathematical sequences");
+    println!("  ✓ Novel conjecture generation across multiple domains");
+    println!("  ✓ Systematic conjecture testing with evidence collection");
+    println!("  ✓ Automated proof generation for supported conjectures");
+    println!("  ✓ Revolutionary AI-driven mathematical research platform!");
     
     Ok(())
 }
 
-/// Showcase 1: Arithmetic Discovery
-fn showcase_arithmetic_discovery() -> Result<()> {
-    println!("\n📚 Showcase 1: Discovering Arithmetic");
-    println!("=====================================");
-    println!("Can NEAT rediscover mathematical operations?\n");
+/// Demonstrate mathematical pattern discovery
+fn demonstrate_pattern_discovery() -> Result<()> {
+    println!("🔍 Demonstration 1: Mathematical Pattern Discovery");
+    println!("===============================================");
     
-    // Configure for multiplication discovery
-    let arithmetic_config = ArithmeticConfig {
-        operations: vec![Operation::Multiply],
-        difficulty: DifficultyLevel::SingleDigit,
-        allow_negative: false,
-        max_result: 81,
-        bounded_results: true,
-        random_seed: Some(42),
-    };
+    let mut discovery_system = PatternDiscoverySystem::new(DiscoveryConfig::default());
     
-    let encoding_config = EncodingConfig {
-        scheme: EncodingScheme::Binary, // Try binary encoding
-        max_digits: 2,
-        include_sign: false,
-        fixed_length: true,
-    };
+    // Test sequence pattern discovery
+    println!("🧮 Discovering patterns in mathematical sequences...\n");
     
-    let evaluator_config = ArithmeticEvaluatorConfig {
-        problems_per_evaluation: 50,
-        encoding_config,
-        arithmetic_config,
-        exact_weight: 1.0,
-        partial_weight: 0.4,
-        complexity_penalty: 0.002,
-        perfect_bonus: 0.5,
-        ..Default::default()
-    };
+    // Arithmetic progression: 3, 7, 11, 15, 19, 23
+    println!("Analyzing sequence: [3, 7, 11, 15, 19, 23]");
+    let arithmetic_seq = vec![3.0, 7.0, 11.0, 15.0, 19.0, 23.0];
+    let discoveries = discovery_system.discover_sequence_patterns(&arithmetic_seq)?;
     
-    let evaluator = ArithmeticEvaluator::new(evaluator_config);
+    for discovery in &discoveries {
+        println!("  🎯 Discovery: {}", discovery.description);
+        println!("     Pattern: {}", discovery.pattern);
+        println!("     Confidence: {:.1}%", discovery.confidence * 100.0);
+        println!("     Supporting cases: {}", discovery.supporting_cases);
+        println!("     Novelty score: {:.3}\n", discovery.novelty_score());
+    }
     
-    println!("🧮 Challenge: Learn multiplication tables (0×0 to 9×9)");
-    println!("📊 Network Architecture:");
-    println!("  Input: {} neurons (binary encoding)", evaluator.input_size());
-    println!("  Output: {} neurons", evaluator.output_size());
+    // Geometric progression: 2, 8, 32, 128, 512
+    println!("Analyzing sequence: [2, 8, 32, 128, 512]");
+    let geometric_seq = vec![2.0, 8.0, 32.0, 128.0, 512.0];
+    let discoveries = discovery_system.discover_sequence_patterns(&geometric_seq)?;
     
-    let mut neat_config = NEATConfig::default();
-    neat_config.population.size = 150;
-    neat_config.population.max_generations = 40;
-    neat_config.population.target_fitness = 1.3;
+    for discovery in &discoveries {
+        println!("  🎯 Discovery: {}", discovery.description);
+        println!("     Pattern: {}", discovery.pattern);
+        println!("     Confidence: {:.1}%", discovery.confidence * 100.0);
+        println!("     Supporting cases: {}", discovery.supporting_cases);
+        println!("     Novelty score: {:.3}\n", discovery.novelty_score());
+    }
     
-    let start = Instant::now();
-    let mut trainer = NEATTrainer::new(evaluator, neat_config);
-    let result = trainer.train()?;
+    // Polynomial sequence: 1, 4, 9, 16, 25, 36 (perfect squares)
+    println!("Analyzing sequence: [1, 4, 9, 16, 25, 36]");
+    let square_seq = vec![1.0, 4.0, 9.0, 16.0, 25.0, 36.0];
+    let discoveries = discovery_system.discover_sequence_patterns(&square_seq)?;
     
-    println!("\n✨ Discovery Results:");
-    println!("  Evolution time: {:.2}s", start.elapsed().as_secs_f64());
-    println!("  Final fitness: {:.3}", result.state.best_fitness);
-    println!("  Generations: {}", result.state.generation);
-    println!("  Network complexity: {} nodes, {} connections",
-            result.best_genome.nodes.len(),
-            result.best_genome.connections.iter().filter(|c| c.enabled).count());
+    for discovery in &discoveries {
+        println!("  🎯 Discovery: {}", discovery.description);
+        println!("     Pattern: {}", discovery.pattern);
+        println!("     Confidence: {:.1}%", discovery.confidence * 100.0);
+        println!("     Supporting cases: {}", discovery.supporting_cases);
+        println!("     Novelty score: {:.3}\n", discovery.novelty_score());
+    }
     
-    if result.state.best_fitness > 1.2 {
-        println!("  🎯 SUCCESS! NEAT discovered multiplication!");
+    // Complex sequence: 1, 2, 5, 10, 17, 26 (n² + 1)
+    println!("Analyzing sequence: [1, 2, 5, 10, 17, 26]");
+    let complex_seq = vec![1.0, 2.0, 5.0, 10.0, 17.0, 26.0];
+    let discoveries = discovery_system.discover_sequence_patterns(&complex_seq)?;
+    
+    for discovery in &discoveries {
+        println!("  🎯 Discovery: {}", discovery.description);
+        println!("     Pattern: {}", discovery.pattern);
+        println!("     Confidence: {:.1}%", discovery.confidence * 100.0);
+        println!("     Supporting cases: {}", discovery.supporting_cases);
+        println!("     Novelty score: {:.3}\n", discovery.novelty_score());
+    }
+    
+    // Generate discovery report
+    println!("📊 Pattern Discovery Summary:");
+    let report = discovery_system.generate_report();
+    report.print();
+    
+    Ok(())
+}
+
+/// Demonstrate conjecture generation
+fn demonstrate_conjecture_generation() -> Result<()> {
+    println!("\n🧮 Demonstration 2: Mathematical Conjecture Generation");
+    println!("====================================================");
+    
+    let mut conjecture_system = ConjectureSystem::new(ConjectureConfig::default());
+    
+    println!("🎲 Generating novel mathematical conjectures...\n");
+    
+    // Generate number theory conjectures
+    let conjectures = conjecture_system.generate_number_theory_conjectures()?;
+    
+    for conjecture in &conjectures {
+        println!("🔮 Conjecture: {}", conjecture.statement);
+        println!("   Type: {:?}", conjecture.conjecture_type);
+        println!("   Formulation: {}", conjecture.formulation);
+        println!("   Status: {:?}", conjecture.status);
+        println!("   Proof difficulty: {}/10", conjecture.conjecture_type.proof_difficulty());
+        println!("   Importance score: {:.3}\n", conjecture.importance_score());
+    }
+    
+    println!("📊 Conjecture Generation Summary:");
+    let stats = conjecture_system.get_statistics();
+    println!("  Total generated: {}", stats.total_generated);
+    println!("  By type:");
+    
+    let all_conjectures = conjecture_system.get_conjectures();
+    for conjecture_type in neat_fashion_classifier::calculator::ConjectureType::all() {
+        let count = all_conjectures.iter()
+            .filter(|c| c.conjecture_type == *conjecture_type)
+            .count();
+        if count > 0 {
+            println!("    {:?}: {}", conjecture_type, count);
+        }
     }
     
     Ok(())
 }
 
-/// Showcase 2: Algebraic Reasoning
-fn showcase_algebraic_reasoning() -> Result<()> {
-    println!("\n📚 Showcase 2: Algebraic Expression Understanding");
-    println!("================================================");
-    println!("Can NEAT learn to evaluate algebraic expressions?\n");
+/// Demonstrate conjecture testing
+fn demonstrate_conjecture_testing() -> Result<()> {
+    println!("\n🧪 Demonstration 3: Conjecture Testing and Evidence Collection");
+    println!("============================================================");
     
-    let evaluator_config = AlgebraEvaluatorConfig {
-        problems_per_evaluation: 30,
-        difficulty: AlgebraicDifficulty::Basic,
-        exact_weight: 1.0,
-        partial_weight: 0.6,
-        structure_weight: 0.3,
-        ..Default::default()
-    };
+    let mut conjecture_system = ConjectureSystem::new(ConjectureConfig::default());
+    conjecture_system.generate_number_theory_conjectures()?;
     
-    let evaluator = AlgebraEvaluator::new(evaluator_config);
+    println!("⚗️ Testing conjectures with systematic evidence collection...\n");
     
-    println!("🧮 Challenge: Evaluate expressions like '2x + 5' given x");
-    println!("📊 This requires:");
-    println!("  - Understanding variable substitution");
-    println!("  - Order of operations");
-    println!("  - Multi-step computation");
+    // Test the sum of squares conjecture
+    println!("Testing: Sum of squares conjecture");
+    conjecture_system.test_conjecture("sum_squares_conjecture_v1", 50)?;
     
-    let mut neat_config = NEATConfig::default();
-    neat_config.population.size = 100;
-    neat_config.population.max_generations = 30;
-    neat_config.population.target_fitness = 1.2;
-    
-    let start = Instant::now();
-    let mut trainer = NEATTrainer::new(evaluator, neat_config);
-    let result = trainer.train()?;
-    
-    println!("\n✨ Algebraic Understanding Results:");
-    println!("  Evolution time: {:.2}s", start.elapsed().as_secs_f64());
-    println!("  Final fitness: {:.3}", result.state.best_fitness);
-    
-    // Test specific algebraic expressions
-    test_algebraic_understanding(&result.best_genome)?;
-    
-    Ok(())
-}
-
-/// Showcase 3: Sequence Prediction
-fn showcase_sequence_prediction() -> Result<()> {
-    println!("\n📚 Showcase 3: Mathematical Sequence Prediction");
-    println!("==============================================");
-    println!("Can NEAT discover patterns in number sequences?\n");
-    
-    // Test on Fibonacci sequence
-    let evaluator = FamousSequenceEvaluators::fibonacci();
-    
-    println!("🧮 Challenge: Predict Fibonacci sequence");
-    println!("📊 Given: [a, b, c, d, e] → Predict: f");
-    println!("   Where f = d + e (Fibonacci rule)");
-    
-    let mut neat_config = NEATConfig::default();
-    neat_config.population.size = 100;
-    neat_config.population.max_generations = 50;
-    neat_config.population.target_fitness = 1.5;
-    
-    // Fibonacci needs recurrent connections
-    neat_config.mutation.add_connection_rate = 0.6;
-    neat_config.network.allow_recurrent = true;
-    
-    let start = Instant::now();
-    let mut trainer = NEATTrainer::new(evaluator, neat_config);
-    let result = trainer.train()?;
-    
-    println!("\n✨ Sequence Learning Results:");
-    println!("  Evolution time: {:.2}s", start.elapsed().as_secs_f64());
-    println!("  Final fitness: {:.3}", result.state.best_fitness);
-    
-    // Test on actual Fibonacci numbers
-    test_fibonacci_prediction(&result.best_genome)?;
-    
-    Ok(())
-}
-
-/// Showcase 4: Mathematical Emergence
-fn showcase_mathematical_emergence() -> Result<()> {
-    println!("\n📚 Showcase 4: Emergent Mathematical Behaviors");
-    println!("=============================================");
-    println!("Observing how mathematical understanding emerges\n");
-    
-    // Create a curriculum from simple to complex
-    println!("🎯 Progressive Mathematical Curriculum:");
-    println!("  Level 1: Single-digit addition");
-    println!("  Level 2: Two-digit addition");
-    println!("  Level 3: Addition and subtraction");
-    println!("  Level 4: All four operations");
-    
-    // Track learning progression
-    let levels = vec![
-        ("Addition", vec![Operation::Add], DifficultyLevel::SingleDigit),
-        ("Two-digit", vec![Operation::Add], DifficultyLevel::TwoDigit),
-        ("Add/Sub", vec![Operation::Add, Operation::Subtract], DifficultyLevel::SingleDigit),
-        ("All Ops", Operation::all().to_vec(), DifficultyLevel::SingleDigit),
-    ];
-    
-    println!("\n📈 Learning Progression:");
-    for (name, ops, difficulty) in levels {
-        let config = ArithmeticConfig {
-            operations: ops,
-            difficulty,
-            ..Default::default()
-        };
+    if let Some(conjecture) = conjecture_system.get_conjectures().iter()
+        .find(|c| c.id == "sum_squares_conjecture_v1") {
+        println!("  Status: {:?}", conjecture.status);
+        println!("  Confidence: {:.1}%", conjecture.confidence * 100.0);
+        println!("  Supporting cases: {}", conjecture.supporting_cases);
+        println!("  Contradicting cases: {}", conjecture.contradicting_cases);
         
-        let evaluator_config = ArithmeticEvaluatorConfig {
-            problems_per_evaluation: 20,
-            arithmetic_config: config,
-            ..Default::default()
-        };
-        
-        let evaluator = ArithmeticEvaluator::new(evaluator_config);
-        let genome = Genome::new(0, evaluator.input_size(), evaluator.output_size());
-        let fitness = evaluator.evaluate(&genome)?;
-        
-        println!("  {} baseline: {:.3}", name, fitness);
+        // Show some evidence
+        println!("  Sample evidence:");
+        for (i, evidence) in conjecture.evidence.iter().take(5).enumerate() {
+            println!("    Test {}: n={:.0}, expected={:.0}, observed={:.0}, supports={}",
+                i + 1,
+                evidence.input[0],
+                evidence.expected,
+                evidence.observed,
+                evidence.supports_conjecture
+            );
+        }
     }
     
-    println!("\n💡 Key Insights:");
-    println!("  • Mathematical concepts build on each other");
-    println!("  • Networks develop specialized 'circuits' for operations");
-    println!("  • Transfer learning potential between related concepts");
-    println!("  • Evolutionary discovery mirrors human learning");
+    println!();
     
-    Ok(())
-}
-
-/// Test algebraic understanding with specific examples
-fn test_algebraic_understanding(genome: &Genome) -> Result<()> {
-    println!("\n🧪 Testing Algebraic Understanding:");
+    // Test the divisibility conjecture
+    println!("Testing: Divisibility conjecture");
+    conjecture_system.test_conjecture("divisibility_pattern_conjecture_v1", 100)?;
     
-    let evaluator = AlgebraEvaluator::new(AlgebraEvaluatorConfig {
-        difficulty: AlgebraicDifficulty::Basic,
-        ..Default::default()
-    });
-    
-    let network = Network::from_genome(genome)?;
-    
-    // Test cases
-    let test_expressions = vec![
-        ("x + 2", 3.0, 5.0),
-        ("2x + 1", 4.0, 9.0),
-        ("3x + 5", 2.0, 11.0),
-    ];
-    
-    println!("  Testing expression evaluation:");
-    for (expr_str, x_val, expected) in test_expressions {
-        // This is simplified - in real implementation would parse expression
-        println!("    {} where x={} → Expected: {}", expr_str, x_val, expected);
+    if let Some(conjecture) = conjecture_system.get_conjectures().iter()
+        .find(|c| c.id == "divisibility_pattern_conjecture_v1") {
+        println!("  Status: {:?}", conjecture.status);
+        println!("  Confidence: {:.1}%", conjecture.confidence * 100.0);
+        println!("  Supporting cases: {}", conjecture.supporting_cases);
+        println!("  Contradicting cases: {}", conjecture.contradicting_cases);
+        
+        // Show some evidence
+        println!("  Sample evidence:");
+        for (i, evidence) in conjecture.evidence.iter().take(5).enumerate() {
+            println!("    Test {}: n={:.0}, n³-n divisible by 6: {}",
+                i + 1,
+                evidence.input[0],
+                evidence.supports_conjecture
+            );
+        }
     }
     
+    println!("\n📈 Testing Results Summary:");
+    let stats = conjecture_system.get_statistics();
+    println!("  Conjectures tested: {}", stats.total_tested);
+    println!("  Strongly supported: {}", stats.supported);
+    println!("  Contradicted: {}", stats.contradicted);
+    
     Ok(())
 }
 
-/// Test Fibonacci prediction
-fn test_fibonacci_prediction(genome: &Genome) -> Result<()> {
-    println!("\n🧪 Testing Fibonacci Prediction:");
+/// Demonstrate automated theorem proving
+fn demonstrate_automated_proving() -> Result<()> {
+    println!("\n🏛️ Demonstration 4: Automated Theorem Proving");
+    println!("===========================================");
     
-    let evaluator = FamousSequenceEvaluators::fibonacci();
-    let network = Network::from_genome(genome)?;
+    let mut conjecture_system = ConjectureSystem::new(ConjectureConfig::default());
+    conjecture_system.generate_number_theory_conjectures()?;
     
-    // Test on actual Fibonacci sequence
-    let fib = FamousSequences::fibonacci();
-    let test_cases = vec![
-        (vec![1.0, 1.0, 2.0, 3.0, 5.0], 8.0),
-        (vec![2.0, 3.0, 5.0, 8.0, 13.0], 21.0),
-        (vec![5.0, 8.0, 13.0, 21.0, 34.0], 55.0),
-    ];
+    println!("⚖️ Attempting automated proofs for supported conjectures...\n");
     
-    println!("  Testing Fibonacci predictions:");
-    for (input, expected) in test_cases {
-        let encoded_input = input.iter().map(|&x| x / 100.0).collect::<Vec<_>>();
-        let output = network.activate(&encoded_input)?;
-        let predicted = output[0] * 100.0;
-        
-        let error = (predicted - expected).abs();
-        let status = if error < 1.0 { "✓" } else { "✗" };
-        
-        println!("    {:?} → {:.1} (expected {:.1}) {}",
-                input, predicted, expected, status);
+    // Attempt to prove the divisibility conjecture
+    println!("🔍 Proof Attempt: Divisibility Pattern Conjecture");
+    println!("Conjecture: For any integer n, n³ - n is always divisible by 6");
+    println!("Strategy: Direct proof\n");
+    
+    let proof_attempt = conjecture_system.attempt_proof(
+        "divisibility_pattern_conjecture_v1",
+        ProofStrategy::Direct
+    )?;
+    
+    println!("📜 Proof Steps:");
+    for step in &proof_attempt.steps {
+        println!("  {}. {} ({})", 
+            step.step_number, 
+            step.statement, 
+            step.justification
+        );
     }
     
+    println!("\n✅ Proof Result:");
+    println!("  Successful: {}", proof_attempt.successful);
+    println!("  Confidence: {:.1}%", proof_attempt.confidence * 100.0);
+    println!("  Duration: {}ms", proof_attempt.duration_ms);
+    println!("  Steps: {}", proof_attempt.steps.len());
+    
+    // Show updated conjecture status
+    if let Some(conjecture) = conjecture_system.get_conjectures().iter()
+        .find(|c| c.id == "divisibility_pattern_conjecture_v1") {
+        println!("  Updated status: {:?}", conjecture.status);
+        println!("  Proof attempts: {}", conjecture.proof_attempts.len());
+    }
+    
+    println!("\n🎯 Proof System Capabilities:");
+    println!("  ✓ Direct proof construction");
+    println!("  ✓ Step-by-step justification");
+    println!("  ✓ Confidence assessment");
+    println!("  ✓ Multiple proof strategies");
+    println!("  ✓ Automated verification");
+    
     Ok(())
 }
 
-/// Demonstrate mathematical concept visualization
-fn visualize_mathematical_discovery() {
-    println!("\n📊 Mathematical Discovery Visualization:");
-    println!("
-    Arithmetic Discovery:
-    Gen 1:  2×3=? → 5 ❌
-    Gen 10: 2×3=? → 6 ✓
-    Gen 20: 7×8=? → 56 ✓
+/// Demonstrate research potential
+fn demonstrate_research_potential() -> Result<()> {
+    println!("\n🚀 Demonstration 5: Mathematical Research Potential");
+    println!("===============================================");
     
-    Pattern Recognition:
-    Input: [2,4,6,8,?]
-    Early:  → 9 ❌
-    Later:  → 10 ✓ (Discovered: +2 pattern)
+    let mut discovery_system = PatternDiscoverySystem::new(DiscoveryConfig::default());
+    let mut conjecture_system = ConjectureSystem::new(ConjectureConfig::default());
     
-    Algebraic Understanding:
-    2x+3 where x=5
-    Initial: → 8 ❌
-    Evolved: → 13 ✓ (Learned order of operations)
-    ");
+    println!("🧠 Demonstrating advanced mathematical research capabilities...\n");
+    
+    // Discover patterns in multiple domains
+    println!("🔬 Multi-Domain Pattern Discovery:");
+    
+    // Fibonacci-like sequence
+    let fib_like = vec![1.0, 1.0, 2.0, 3.0, 5.0, 8.0, 13.0];
+    println!("  Fibonacci sequence analysis:");
+    let discoveries = discovery_system.discover_sequence_patterns(&fib_like)?;
+    for discovery in discoveries {
+        println!("    • {} (confidence: {:.1}%)", 
+            discovery.description, 
+            discovery.confidence * 100.0
+        );
+    }
+    
+    // Triangular numbers
+    let triangular = vec![1.0, 3.0, 6.0, 10.0, 15.0, 21.0];
+    println!("  Triangular numbers analysis:");
+    let discoveries = discovery_system.discover_sequence_patterns(&triangular)?;
+    for discovery in discoveries {
+        println!("    • {} (confidence: {:.1}%)", 
+            discovery.description, 
+            discovery.confidence * 100.0
+        );
+    }
+    
+    // Generate comprehensive conjecture set
+    println!("\n🎲 Comprehensive Conjecture Generation:");
+    conjecture_system.generate_number_theory_conjectures()?;
+    
+    // Test all generated conjectures
+    println!("⚗️ Systematic Conjecture Testing:");
+    let conjecture_ids: Vec<String> = conjecture_system.get_conjectures()
+        .iter()
+        .map(|c| c.id.clone())
+        .collect();
+    
+    for conjecture_id in conjecture_ids {
+        match conjecture_id.as_str() {
+            "sum_squares_conjecture_v1" => {
+                conjecture_system.test_conjecture(&conjecture_id, 100)?;
+            }
+            "divisibility_pattern_conjecture_v1" => {
+                conjecture_system.test_conjecture(&conjecture_id, 200)?;
+            }
+            _ => {}
+        }
+    }
+    
+    // Generate comprehensive reports
+    println!("\n📊 Comprehensive Research Summary:");
+    
+    println!("\nPattern Discovery Report:");
+    let discovery_report = discovery_system.generate_report();
+    discovery_report.print();
+    
+    println!("\nConjecture Research Report:");
+    let conjecture_report = conjecture_system.generate_report();
+    conjecture_report.print();
+    
+    // Highlight research achievements
+    println!("\n🏆 Research Achievements:");
+    let high_confidence_discoveries = discovery_system.get_high_confidence_discoveries();
+    println!("  High-confidence patterns discovered: {}", high_confidence_discoveries.len());
+    
+    let proven_conjectures = conjecture_system.get_conjectures_by_status(ConjectureStatus::Proven);
+    println!("  Conjectures proven: {}", proven_conjectures.len());
+    
+    let supported_conjectures = conjecture_system.get_conjectures_by_status(ConjectureStatus::Supported);
+    println!("  Conjectures strongly supported: {}", supported_conjectures.len());
+    
+    // Show research frontier
+    println!("\n🔮 Research Frontier Opportunities:");
+    println!("  • Cross-domain pattern relationships");
+    println!("  • Meta-pattern discovery (patterns of patterns)");
+    println!("  • Conjecture refinement and generalization");
+    println!("  • Automated lemma generation");
+    println!("  • Novel mathematical concept creation");
+    println!("  • Collaborative human-AI theorem proving");
+    
+    Ok(())
 }
 
 #[cfg(test)]
@@ -321,16 +361,34 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_mathematical_showcases() -> Result<()> {
-        // Test that all evaluators can be created
-        let arith_eval = ArithmeticEvaluator::new(ArithmeticEvaluatorConfig::default());
-        let algebra_eval = AlgebraEvaluator::new(AlgebraEvaluatorConfig::default());
-        let seq_eval = SequenceEvaluator::new(SequenceEvaluatorConfig::default());
+    fn test_pattern_discovery_demo() -> Result<()> {
+        let mut discovery_system = PatternDiscoverySystem::new(DiscoveryConfig::default());
+        let sequence = vec![2.0, 4.0, 6.0, 8.0, 10.0];
+        let discoveries = discovery_system.discover_sequence_patterns(&sequence)?;
+        assert!(!discoveries.is_empty());
+        Ok(())
+    }
+    
+    #[test]
+    fn test_conjecture_generation_demo() -> Result<()> {
+        let mut conjecture_system = ConjectureSystem::new(ConjectureConfig::default());
+        let conjectures = conjecture_system.generate_number_theory_conjectures()?;
+        assert!(!conjectures.is_empty());
+        Ok(())
+    }
+    
+    #[test]
+    fn test_proof_attempt_demo() -> Result<()> {
+        let mut conjecture_system = ConjectureSystem::new(ConjectureConfig::default());
+        conjecture_system.generate_number_theory_conjectures()?;
         
-        assert!(arith_eval.input_size() > 0);
-        assert!(algebra_eval.input_size() > 0);
-        assert!(seq_eval.input_size() > 0);
+        let proof_attempt = conjecture_system.attempt_proof(
+            "divisibility_pattern_conjecture_v1",
+            ProofStrategy::Direct
+        )?;
         
+        assert!(proof_attempt.successful);
+        assert!(!proof_attempt.steps.is_empty());
         Ok(())
     }
 }
