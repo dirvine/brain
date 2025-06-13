@@ -9,6 +9,9 @@ pub mod network;
 pub mod fitness;
 pub mod mutation;
 pub mod topology;
+pub mod crossover;
+pub mod speciation;
+pub mod population;
 
 #[cfg(test)]
 pub mod integration_tests;
@@ -20,3 +23,6 @@ pub use network::{Network, NetworkInfo};
 pub use fitness::{FitnessEvaluator, ClassificationEvaluator, XORFitnessEvaluator, FitnessResults};
 pub use mutation::{MutationContext, MutationPipeline, Mutation};
 pub use topology::{TopologyAnalyzer, TopologyAnalysis};
+pub use crossover::{NEATCrossover, CrossoverContext, CrossoverResult, CrossoverStats};
+pub use speciation::{Species, SpeciesManager, SpeciationStatistics};
+pub use population::{PopulationManager, EvolutionStats, SelectionMethod};
