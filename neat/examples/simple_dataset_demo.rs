@@ -2,7 +2,7 @@
 //!
 //! This example demonstrates the basic dataset functionality without full Fashion-MNIST.
 
-use neat_fashion_classifier::{
+use neat::{
     config::NEATConfig,
     dataset::{DatasetEvaluator, DatasetEvaluatorConfig, Dataset},
     neat::{trainer::NEATTrainer, genome::Genome, fitness::FitnessEvaluator},
@@ -163,7 +163,7 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use neat_fashion_classifier::neat::fitness::FitnessEvaluator;
+    use neat::neat::fitness::FitnessEvaluator;
     
     #[test]
     fn test_simple_dataset() -> Result<()> {

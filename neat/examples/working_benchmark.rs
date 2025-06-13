@@ -3,8 +3,8 @@
 //! This example demonstrates the core NEAT functionality that is working
 //! perfectly, bypassing the benchmark framework compilation issues.
 
-use neat_fashion_classifier::neat::{NEATTrainer, fitness::XORFitnessEvaluator};
-use neat_fashion_classifier::config::NEATConfig;
+use neat::neat::{NEATTrainer, fitness::XORFitnessEvaluator};
+use neat::config::NEATConfig;
 use std::time::Instant;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

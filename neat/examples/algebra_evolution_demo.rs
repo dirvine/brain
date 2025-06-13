@@ -1,10 +1,10 @@
 //! Algebraic Learning Evolution Demo
 //!
-//! This revolutionary example demonstrates NEAT learning algebraic concepts,
+//! This example demonstrates NEAT learning algebraic concepts,
 //! from simple expression evaluation to equation solving - a breakthrough
 //! in evolutionary mathematical reasoning!
 
-use neat_fashion_classifier::{
+use neat::{
     config::NEATConfig,
     calculator::{
         AlgebraEvaluator, AlgebraEvaluatorConfig, AlgebraEncodingConfig,
@@ -17,7 +17,7 @@ use std::collections::HashMap;
 use std::time::Instant;
 
 fn main() -> Result<()> {
-    println!("🧮 Revolutionary Algebraic Learning with NEAT");
+    println!("🧮 Algebraic Learning with NEAT");
     println!("===========================================");
     println!("Watch as neural networks evolve to understand algebra!");
     

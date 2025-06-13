@@ -3,7 +3,7 @@
 //! This example demonstrates training a NEAT network on the Fashion-MNIST dataset.
 //! Run with: cargo run --example fashion_mnist_demo
 
-use neat_fashion_classifier::{
+use neat::{
     config::NEATConfig,
     dataset::{
         fashion_mnist::{FashionMNISTEvaluator, FashionMNISTDataset},
@@ -163,14 +163,14 @@ fn run_generation_analysis() -> Result<()> {
     // Test different network sizes
     println!("🔍 Network Size Analysis:");
     for &num_hidden in &[0, 5, 10, 20] {
-        let mut genome = neat_fashion_classifier::neat::genome::Genome::new(0, 784, 10);
+        let mut genome = neat::neat::genome::Genome::new(0, 784, 10);
         
         // Add hidden nodes (simplified for demo)
         for i in 0..num_hidden {
-            let hidden_node = neat_fashion_classifier::neat::genome::NodeGene::new(
+            let hidden_node = neat::neat::genome::NodeGene::new(
                 1000 + i,
-                neat_fashion_classifier::neat::genome::NodeType::Hidden,
-                neat_fashion_classifier::neat::genome::ActivationType::Tanh,
+                neat::neat::genome::NodeType::Hidden,
+                neat::neat::genome::ActivationType::Tanh,
             );
             let _ = genome.add_node(hidden_node);
         }
@@ -203,7 +203,7 @@ mod tests {
         let evaluator = FashionMNISTEvaluator::with_subset(&data_dir, 10, 5, config)?;
         
         // Test evaluation
-        let genome = neat_fashion_classifier::neat::genome::Genome::new(0, 784, 10);
+        let genome = neat::neat::genome::Genome::new(0, 784, 10);
         let fitness = evaluator.evaluate(&genome)?;
         assert!(fitness >= 0.0);
         assert!(fitness <= 1.0);

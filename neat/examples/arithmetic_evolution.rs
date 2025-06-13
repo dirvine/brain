@@ -3,7 +3,7 @@
 //! This example demonstrates NEAT learning arithmetic operations from scratch.
 //! Watch as networks evolve to discover mathematical concepts!
 
-use neat_fashion_classifier::{
+use neat::{
     config::NEATConfig,
     calculator::{
         ArithmeticEvaluator, ArithmeticEvaluatorConfig, ArithmeticConfig, EncodingConfig,

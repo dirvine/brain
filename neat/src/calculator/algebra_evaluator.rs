@@ -1,6 +1,6 @@
 //! Fitness evaluators for algebraic learning tasks
 //!
-//! This module provides revolutionary fitness evaluation for NEAT networks
+//! This module provides advanced fitness evaluation for NEAT networks
 //! learning algebraic concepts, from expression evaluation to equation solving.
 
 use super::algebra::{Expression, AlgebraProblem};

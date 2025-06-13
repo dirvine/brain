@@ -1,6 +1,6 @@
 //! Mathematical Discovery and Pattern Recognition System
 //!
-//! This revolutionary module enables NEAT to discover novel mathematical patterns,
+//! This module enables NEAT to discover novel mathematical patterns,
 //! generate conjectures, and assist in theorem proving. It represents the cutting
 //! edge of AI-driven mathematical research.
 
@@ -466,9 +466,9 @@ impl PatternDiscoverySystem {
         
         match module.evaluate(&input) {
             Ok(output) => {
-                let pattern_type = output[0].round() as i32;
-                let confidence = output[1];
-                let prediction = output[2];
+                let pattern_type = output.get(0).unwrap_or(&0.0).round() as i32;
+                let confidence = *output.get(1).unwrap_or(&0.8);
+                let prediction = *output.get(2).unwrap_or(&0.0);
                 
                 if confidence > 0.8 {
                     let mut discovery = MathematicalDiscovery::new(

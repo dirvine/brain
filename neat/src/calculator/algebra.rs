@@ -1,7 +1,7 @@
 //! Algebraic expression handling and pattern recognition
 //!
 //! This module extends our calculator to handle algebraic expressions,
-//! variables, and symbolic mathematics - a revolutionary step towards
+//! variables, and symbolic mathematics - a significant step towards
 //! mathematical reasoning in evolved neural networks.
 
 use super::Operation;

@@ -15,8 +15,8 @@
 //! ## Quick Start
 //!
 //! ```rust
-//! use neat_fashion_classifier::neat::Genome;
-//! use neat_fashion_classifier::config::NEATConfig;
+//! use neat::neat::Genome;
+//! use neat::config::NEATConfig;
 //!
 //! // Create a genome for Fashion-MNIST (784 inputs, 10 outputs)
 //! let genome = Genome::new(0, 784, 10);

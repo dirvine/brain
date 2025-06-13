@@ -158,7 +158,7 @@ impl Genome {
     /// # Examples
     /// 
     /// ```
-    /// use neat_fashion_classifier::neat::Genome;
+    /// use neat::neat::Genome;
     /// 
     /// let genome = Genome::new(0, 784, 10);
     /// assert_eq!(genome.get_input_count(), 784);

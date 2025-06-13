@@ -1,10 +1,10 @@
 //! Mathematical Discovery and Conjecture Demo
 //!
-//! This revolutionary example demonstrates NEAT's ability to discover novel
+//! This example demonstrates NEAT's ability to discover novel
 //! mathematical patterns, generate conjectures, and attempt proofs - pushing
 //! the boundaries of AI-driven mathematical research!
 
-use neat_fashion_classifier::{
+use neat::{
     calculator::{
         PatternDiscoverySystem, DiscoveryConfig, DiscoveryType,
         ConjectureSystem, ConjectureConfig, ConjectureStatus, ProofStrategy,
@@ -31,7 +31,7 @@ fn main() -> Result<()> {
     println!("  ✓ Novel conjecture generation across multiple domains");
     println!("  ✓ Systematic conjecture testing with evidence collection");
     println!("  ✓ Automated proof generation for supported conjectures");
-    println!("  ✓ Revolutionary AI-driven mathematical research platform!");
+    println!("  ✓ Advanced AI-driven mathematical research platform!");
     
     Ok(())
 }
@@ -133,7 +133,7 @@ fn demonstrate_conjecture_generation() -> Result<()> {
     println!("  By type:");
     
     let all_conjectures = conjecture_system.get_conjectures();
-    for conjecture_type in neat_fashion_classifier::calculator::ConjectureType::all() {
+    for conjecture_type in neat::calculator::ConjectureType::all() {
         let count = all_conjectures.iter()
             .filter(|c| c.conjecture_type == *conjecture_type)
             .count();

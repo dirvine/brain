@@ -1,10 +1,10 @@
 //! HuggingFace Mathematical Dataset Integration Demo
 //!
-//! This revolutionary example demonstrates NEAT learning from real mathematical
+//! This example demonstrates NEAT learning from real mathematical
 //! datasets like GSM8K, showcasing how evolution can discover mathematical
 //! reasoning from natural language problems!
 
-use neat_fashion_classifier::{
+use neat::{
     config::NEATConfig,
     calculator::{
         AlgebraEvaluator, AlgebraEvaluatorConfig, AlgebraicDifficulty,

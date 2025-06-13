@@ -38,22 +38,22 @@ Analyzing sequence: [3, 7, 11, 15, 19, 23]
 ✅ Proof Result: Successful (100.0% confidence, 6 steps)
 ```
 
-## 🚀 **Main Implementation: NEAT Fashion Classifier**
+## 🚀 **Main Implementation: NEAT**
 
 The complete revolutionary system is implemented in:
 
-### **📁 [neat-fashion-classifier/](neat-fashion-classifier/)**
+### **📁 [neat/](neat/)**
 
 This directory contains:
-- **📖 [Complete README](neat-fashion-classifier/README.md)**: Revolutionary AI Mathematical Research Platform
-- **🔬 [Mathematical Discovery System Documentation](neat-fashion-classifier/docs/mathematical-discovery-system.md)**: Technical deep-dive
+- **📖 [Complete README](neat/README.md)**: Revolutionary AI Mathematical Research Platform
+- **🔬 [Mathematical Discovery System Documentation](neat/docs/mathematical-discovery-system.md)**: Technical deep-dive
 - **💻 Source Code**: 21 specialized mathematical modules, pattern discovery, conjecture generation, automated theorem proving
 - **🎯 Live Demos**: Working examples of mathematical discovery and theorem proving
 
 ## 🏃 **Quick Start**
 
 ```bash
-cd neat-fashion-classifier
+cd neat
 
 # Run the revolutionary mathematical discovery demo
 cargo run --example mathematical_discovery_demo
@@ -105,7 +105,7 @@ This system represents a **paradigm shift** in AI-driven mathematical research, 
 📁 brain/
 ├── README.md (this file)                    # Project overview
 ├── docs/                                    # Historical development docs
-└── neat-fashion-classifier/                 # 🚀 MAIN IMPLEMENTATION
+└── neat/                                    # 🚀 MAIN IMPLEMENTATION
     ├── README.md                            # Complete system documentation
     ├── docs/mathematical-discovery-system.md # Technical deep-dive
     ├── src/calculator/                      # Mathematical research platform
@@ -123,4 +123,4 @@ This system represents a **paradigm shift** in AI-driven mathematical research, 
 
 **🌟 This project demonstrates that AI can engage in the creative and analytical processes that drive mathematical discovery - opening unprecedented possibilities for human-AI collaboration in advancing mathematical knowledge.**
 
-**📖 [→ Explore the Complete Mathematical Discovery System](neat-fashion-classifier/README.md)**
+**📖 [→ Explore the Complete Mathematical Discovery System](neat/README.md)**

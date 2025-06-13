@@ -1,13 +1,13 @@
 [package]
-name = "neat-fashion-classifier"
+name = "neat"
 version = "0.1.0"
 edition = "2021"
 authors = ["David Irvine <david@maidsafe.net>"]
-description = "NEAT algorithm implementation for Fashion-MNIST classification"
+description = "Revolutionary NEAT implementation for AI-driven mathematical research and discovery"
 license = "MIT"
 repository = "https://github.com/dirvine/brain"
 readme = "README.md"
-keywords = ["neat", "neuroevolution", "machine-learning", "neural-networks"]
+keywords = ["neat", "neuroevolution", "mathematical-discovery", "theorem-proving", "ai-research"]
 categories = ["science", "algorithms"]
 
 [dependencies]

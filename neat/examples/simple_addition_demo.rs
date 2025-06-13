@@ -3,7 +3,7 @@
 //! This example focuses on the simplest possible arithmetic: single-digit addition.
 //! Perfect for demonstrating how NEAT can discover mathematical concepts.
 
-use neat_fashion_classifier::{
+use neat::{
     config::NEATConfig,
     calculator::{
         ArithmeticEvaluator, ArithmeticEvaluatorConfig, ArithmeticConfig, EncodingConfig,

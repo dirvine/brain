@@ -1,10 +1,10 @@
 //! Modular Mathematical Evolution Demo
 //!
-//! This revolutionary example demonstrates the power of modular mathematical
+//! This example demonstrates the power of modular mathematical
 //! components in NEAT - how specialized modules can be evolved, composed,
 //! and reused to solve complex mathematical problems!
 
-use neat_fashion_classifier::{
+use neat::{
     config::NEATConfig,
     calculator::{
         // Module system
@@ -37,7 +37,7 @@ fn main() -> Result<()> {
     println!("  ✓ Module testing and benchmarking");
     println!("  ✓ Module composition for complex reasoning");
     println!("  ✓ Hierarchical learning with reusable components");
-    println!("  ✓ Revolutionary modular AI architecture!");
+    println!("  ✓ Advanced modular AI architecture!");
     
     Ok(())
 }

@@ -1,6 +1,6 @@
 //! Mathematical Conjecture Generation and Testing System
 //!
-//! This revolutionary module enables NEAT to generate mathematical conjectures,
+//! This module enables NEAT to generate mathematical conjectures,
 //! test them systematically, and build towards automated theorem proving.
 
 use crate::neat::genome::Genome;
