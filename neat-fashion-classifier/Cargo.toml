@@ -1,0 +1,84 @@
+[package]
+name = "neat-fashion-classifier"
+version = "0.1.0"
+edition = "2021"
+authors = ["David Irvine <david@maidsafe.net>"]
+description = "NEAT algorithm implementation for Fashion-MNIST classification"
+license = "MIT"
+repository = "https://github.com/dirvine/brain"
+readme = "README.md"
+keywords = ["neat", "neuroevolution", "machine-learning", "neural-networks"]
+categories = ["science", "algorithms"]
+
+[dependencies]
+# Core dependencies
+ndarray = { version = "0.15", features = ["rayon"] }
+ndarray-rand = "0.14"
+rand = { version = "0.8", features = ["small_rng"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# Parallel processing
+rayon = "1.7"
+crossbeam = "0.8"
+
+# Error handling and logging
+thiserror = "1.0"
+anyhow = "1.0"
+log = "0.4"
+env_logger = { version = "0.10", optional = true }
+
+# Data handling (optional for future HuggingFace integration)
+hf-hub = { version = "0.3", optional = true }
+image = { version = "0.24", optional = true }
+
+# CLI support (optional)
+clap = { version = "4.0", features = ["derive"], optional = true }
+
+[dev-dependencies]
+# Testing frameworks
+proptest = "1.0"
+approx = "0.5"
+criterion = { version = "0.5", features = ["html_reports"] }
+tempfile = "3.0"
+env_logger = "0.10"
+
+[features]
+default = ["std", "logging"]
+std = []
+logging = ["env_logger"]
+datasets = ["hf-hub", "image"]
+cli = ["clap"]
+
+[[bench]]
+name = "neat_benchmarks"
+harness = false
+
+[profile.dev]
+debug = true
+opt-level = 0
+overflow-checks = true
+
+[profile.dev.package."*"]
+opt-level = 2  # Optimize dependencies even in debug mode
+
+[profile.release]
+debug = false
+lto = true
+codegen-units = 1
+opt-level = 3
+
+[profile.bench]
+debug = true
+opt-level = 3
+
+[lints.clippy]
+pedantic = "warn"
+nursery = "warn"
+cargo = "warn"
+# Allow certain pedantic lints that can be noisy
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
