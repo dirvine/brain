@@ -1,27 +1,68 @@
-//! # NEAT Fashion-MNIST Classifier
+//! # NEAT Mathematical Discovery and Educational Platform
 //!
-//! A complete implementation of the NeuroEvolution of Augmenting Topologies (NEAT) algorithm
-//! for Fashion-MNIST classification. This library provides efficient, parallel evolution of
-//! neural network topologies and weights using modern Rust best practices.
+//! A comprehensive implementation combining NeuroEvolution of Augmenting Topologies (NEAT) with
+//! advanced mathematical problem solving and educational technology. This platform evolves neural
+//! networks to solve mathematical problems while providing adaptive tutoring and personalized
+//! learning experiences.
 //!
 //! ## Features
 //!
-//! - Complete NEAT algorithm implementation with historical markings
-//! - Efficient parallel fitness evaluation
+//! ### Core NEAT Implementation
+//! - Complete NEAT algorithm with historical markings and speciation
+//! - Efficient parallel fitness evaluation and evolution
 //! - Species-based evolution with innovation protection
-//! - Comprehensive testing and benchmarking
-//! - Future HuggingFace dataset integration
+//!
+//! ### Mathematical Problem Solving
+//! - 21 specialized mathematical modules (arithmetic, algebra, calculus, etc.)
+//! - Algebraic expression parsing and evaluation
+//! - Automated mathematical discovery system
+//!
+//! ### Educational Technology
+//! - Adaptive tutoring system with multiple teaching strategies
+//! - Personalized learning paths and curriculum generation
+//! - Comprehensive assessment engine with difficulty calibration
+//! - Real-time learning analytics and progress tracking
+//! - Step-by-step solution explanations with learning style adaptation
 //!
 //! ## Quick Start
 //!
+//! ### Mathematical Problem Solving
+//! ```rust
+//! use neat::calculator::Calculator;
+//! use neat::calculator::algebra::AlgebraProblem;
+//!
+//! // Create a calculator and solve a linear equation
+//! let mut calculator = Calculator::new();
+//! let problem = AlgebraProblem::linear_equation(2.0, 3.0, 7.0); // 2x + 3 = 7
+//! match calculator.solve_problem(&problem) {
+//!     Ok(solution) => println!("Solution: x = {}", solution),
+//!     Err(e) => println!("Error: {}", e),
+//! }
+//! ```
+//!
+//! ### Educational Platform
+//! ```rust
+//! use neat::education::{EducationalPlatform, EducationConfig, LearningStyle};
+//!
+//! // Create educational platform and register a student
+//! let config = EducationConfig::default();
+//! let mut platform = EducationalPlatform::new(config);
+//! platform.register_student("student1".to_string(), 15, LearningStyle::Visual).unwrap();
+//!
+//! // Start a tutoring session
+//! let session = platform.start_tutoring_session("student1").unwrap();
+//! println!("Started session: {}", session.session_id);
+//! ```
+//!
+//! ### NEAT Evolution
 //! ```rust
 //! use neat::neat::Genome;
 //! use neat::config::NEATConfig;
 //!
-//! // Create a genome for Fashion-MNIST (784 inputs, 10 outputs)
-//! let genome = Genome::new(0, 784, 10);
-//! assert_eq!(genome.get_input_count(), 784);
-//! assert_eq!(genome.get_output_count(), 10);
+//! // Create a genome for mathematical problem solving
+//! let genome = Genome::new(0, 10, 1); // 10 inputs, 1 output
+//! assert_eq!(genome.get_input_count(), 10);
+//! assert_eq!(genome.get_output_count(), 1);
 //!
 //! // Use default NEAT configuration
 //! let config = NEATConfig::default();
@@ -39,12 +80,27 @@ pub mod config;
 pub mod neat;
 pub mod dataset;
 pub mod calculator;
+pub mod education;
 // Temporarily disabled while fixing compilation issues
 // pub mod benchmarks;
 
 // Re-export commonly used types
 pub use crate::config::NEATConfig;
 pub use crate::neat::{Genome, NodeGene, ConnectionGene, NodeType, ActivationType};
+
+// Re-export educational platform types
+pub use crate::education::{
+    EducationalPlatform, 
+    EducationConfig, 
+    StudentModel, 
+    LearningStyle,
+    AdaptiveTutor,
+    AssessmentEngine,
+    CurriculumGenerator,
+    LearningAnalytics,
+    EducationalProblemGenerator,
+    ExplanationEngine,
+};
 
 /// Common error types used throughout the library
 pub mod error {

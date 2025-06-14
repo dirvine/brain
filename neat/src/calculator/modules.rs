@@ -31,6 +31,8 @@ pub enum ModuleType {
     Trigonometry,
     /// Calculus operations (derivatives, integrals)
     Calculus,
+    /// Discrete mathematics (combinatorics, graph theory)
+    DiscreteMath,
     /// Logic and boolean operations
     Logic,
 }
@@ -48,6 +50,7 @@ impl ModuleType {
             ModuleType::Statistics,
             ModuleType::Trigonometry,
             ModuleType::Calculus,
+            ModuleType::DiscreteMath,
             ModuleType::Logic,
         ]
     }
@@ -65,6 +68,7 @@ impl ModuleType {
             ModuleType::Statistics => 4,
             ModuleType::Trigonometry => 5,
             ModuleType::Calculus => 6,
+            ModuleType::DiscreteMath => 7,
         }
     }
     
@@ -80,6 +84,7 @@ impl ModuleType {
             ModuleType::Statistics => 12,     // Data points
             ModuleType::Trigonometry => 3,    // Angle + function type
             ModuleType::Calculus => 8,        // Function representation
+            ModuleType::DiscreteMath => 6,    // Operation type + parameters
             ModuleType::Logic => 4,           // Boolean values + operation
         }
     }
@@ -96,6 +101,7 @@ impl ModuleType {
             ModuleType::Statistics => 2,      // Mean, variance, etc.
             ModuleType::Trigonometry => 1,    // Function value
             ModuleType::Calculus => 1,        // Derivative/integral value
+            ModuleType::DiscreteMath => 1,    // Combinatorial/graph result
             ModuleType::Logic => 1,           // Boolean result
         }
     }
@@ -113,6 +119,7 @@ impl fmt::Display for ModuleType {
             ModuleType::Statistics => write!(f, "Statistics"),
             ModuleType::Trigonometry => write!(f, "Trigonometry"),
             ModuleType::Calculus => write!(f, "Calculus"),
+            ModuleType::DiscreteMath => write!(f, "Discrete Math"),
             ModuleType::Logic => write!(f, "Logic"),
         }
     }
@@ -170,6 +177,12 @@ impl MathModule {
             ModuleType::Arithmetic => self.evaluate_arithmetic(&adjusted_input),
             ModuleType::LinearAlgebra => self.evaluate_linear_algebra(&adjusted_input),
             ModuleType::Polynomial => self.evaluate_polynomial(&adjusted_input),
+            ModuleType::Calculus => self.evaluate_calculus(&adjusted_input),
+            ModuleType::Trigonometry => self.evaluate_trigonometry(&adjusted_input),
+            ModuleType::Statistics => self.evaluate_statistics(&adjusted_input),
+            ModuleType::DiscreteMath => self.evaluate_discrete_math(&adjusted_input),
+            ModuleType::NumberTheory => self.evaluate_number_theory(&adjusted_input),
+            ModuleType::Geometry => self.evaluate_geometry(&adjusted_input),
             _ => {
                 // For other types, provide simple fallback operations
                 self.evaluate_fallback(&adjusted_input)
@@ -265,6 +278,384 @@ impl MathModule {
         let result = a * x * x + b * x + c;
         
         Ok(vec![result])
+    }
+    
+    /// Evaluate calculus operations
+    fn evaluate_calculus(&self, input: &[f64]) -> Result<Vec<f64>> {
+        if input.len() < 4 {
+            return Ok(vec![0.0]);
+        }
+        
+        let operation = input[0].round() as i32;
+        let a = input[1];  // coefficient
+        let b = input[2];  // power/parameter
+        let x = input[3];  // evaluation point
+        
+        let result = match operation {
+            0 => {
+                // Derivative: d/dx(ax^b) = a*b*x^(b-1)
+                if b == 0.0 {
+                    0.0
+                } else if b == 1.0 {
+                    a
+                } else {
+                    a * b * x.powf(b - 1.0)
+                }
+            },
+            1 => {
+                // Simple integration: ∫ax^b dx = a*x^(b+1)/(b+1)
+                if b == -1.0 {
+                    a * x.ln()
+                } else {
+                    a * x.powf(b + 1.0) / (b + 1.0)
+                }
+            },
+            2 => {
+                // Function evaluation: f(x) = ax^b
+                a * x.powf(b)
+            },
+            _ => {
+                // Default: simple polynomial evaluation
+                a * x + b
+            }
+        };
+        
+        Ok(vec![result])
+    }
+    
+    /// Evaluate trigonometry operations
+    fn evaluate_trigonometry(&self, input: &[f64]) -> Result<Vec<f64>> {
+        if input.len() < 2 {
+            return Ok(vec![0.0]);
+        }
+        
+        let function_type = input[0].round() as i32;
+        let angle = input[1];
+        let amplitude = input.get(2).unwrap_or(&1.0);
+        
+        let result = match function_type {
+            0 => amplitude * angle.sin(),        // sine
+            1 => amplitude * angle.cos(),        // cosine
+            2 => amplitude * angle.tan(),        // tangent
+            3 => {                               // arcsine
+                if angle.abs() <= 1.0 {
+                    amplitude * angle.asin()
+                } else {
+                    0.0
+                }
+            },
+            4 => {                               // arccosine
+                if angle.abs() <= 1.0 {
+                    amplitude * angle.acos()
+                } else {
+                    0.0
+                }
+            },
+            5 => amplitude * angle.atan(),       // arctangent
+            6 => amplitude * angle.sinh(),       // hyperbolic sine
+            7 => amplitude * angle.cosh(),       // hyperbolic cosine
+            8 => amplitude * angle.tanh(),       // hyperbolic tangent
+            _ => amplitude * angle.sin(),        // default to sine
+        };
+        
+        Ok(vec![result])
+    }
+    
+    /// Evaluate statistics operations
+    fn evaluate_statistics(&self, input: &[f64]) -> Result<Vec<f64>> {
+        if input.is_empty() {
+            return Ok(vec![0.0, 0.0]);
+        }
+        
+        let operation = input[0].round() as i32;
+        let data = &input[1..];
+        
+        if data.is_empty() {
+            return Ok(vec![0.0, 0.0]);
+        }
+        
+        let (stat1, stat2) = match operation {
+            0 => {
+                // Mean and standard deviation
+                let mean = data.iter().sum::<f64>() / data.len() as f64;
+                let variance = data.iter()
+                    .map(|x| (x - mean).powi(2))
+                    .sum::<f64>() / (data.len() - 1).max(1) as f64;
+                (mean, variance.sqrt())
+            },
+            1 => {
+                // Min and max
+                let min = data.iter().fold(f64::INFINITY, |a, &b| a.min(b));
+                let max = data.iter().fold(f64::NEG_INFINITY, |a, &b| a.max(b));
+                (min, max)
+            },
+            2 => {
+                // Median and IQR
+                let mut sorted = data.to_vec();
+                sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                let n = sorted.len();
+                let median = if n % 2 == 0 {
+                    (sorted[n/2 - 1] + sorted[n/2]) / 2.0
+                } else {
+                    sorted[n/2]
+                };
+                let q1_idx = n / 4;
+                let q3_idx = 3 * n / 4;
+                let iqr = sorted[q3_idx] - sorted[q1_idx];
+                (median, iqr)
+            },
+            _ => {
+                // Default: sum and count
+                let sum = data.iter().sum::<f64>();
+                let count = data.len() as f64;
+                (sum, count)
+            }
+        };
+        
+        Ok(vec![stat1, stat2])
+    }
+    
+    /// Evaluate number theory operations
+    fn evaluate_number_theory(&self, input: &[f64]) -> Result<Vec<f64>> {
+        if input.len() < 2 {
+            return Ok(vec![0.0]);
+        }
+        
+        let operation = input[0].round() as i32;
+        let a = input[1].abs() as u64;
+        let b = input.get(2).unwrap_or(&0.0).abs() as u64;
+        
+        let result = match operation {
+            0 => {
+                // GCD (Greatest Common Divisor)
+                self.gcd(a, b) as f64
+            },
+            1 => {
+                // LCM (Least Common Multiple)
+                if a == 0 || b == 0 {
+                    0.0
+                } else {
+                    (a * b / self.gcd(a, b)) as f64
+                }
+            },
+            2 => {
+                // Prime check (1 if prime, 0 if not)
+                if self.is_prime(a) { 1.0 } else { 0.0 }
+            },
+            3 => {
+                // Factorial
+                if a <= 20 { // Prevent overflow
+                    self.factorial(a) as f64
+                } else {
+                    0.0
+                }
+            },
+            4 => {
+                // Fibonacci
+                if a <= 93 { // Prevent overflow for u64
+                    self.fibonacci(a) as f64
+                } else {
+                    0.0
+                }
+            },
+            _ => {
+                // Default: modulo operation
+                if b > 0 {
+                    (a % b) as f64
+                } else {
+                    a as f64
+                }
+            }
+        };
+        
+        Ok(vec![result])
+    }
+    
+    /// Evaluate geometry operations
+    fn evaluate_geometry(&self, input: &[f64]) -> Result<Vec<f64>> {
+        if input.len() < 3 {
+            return Ok(vec![0.0]);
+        }
+        
+        let shape_type = input[0].round() as i32;
+        let param1 = input[1];
+        let param2 = input[2];
+        
+        let result = match shape_type {
+            0 => {
+                // Circle: area = π * r²
+                std::f64::consts::PI * param1 * param1
+            },
+            1 => {
+                // Rectangle: area = width * height
+                param1 * param2
+            },
+            2 => {
+                // Triangle: area = 0.5 * base * height
+                0.5 * param1 * param2
+            },
+            3 => {
+                // Circle: circumference = 2 * π * r
+                2.0 * std::f64::consts::PI * param1
+            },
+            4 => {
+                // Rectangle: perimeter = 2 * (width + height)
+                2.0 * (param1 + param2)
+            },
+            5 => {
+                // Pythagorean theorem: c = √(a² + b²)
+                (param1 * param1 + param2 * param2).sqrt()
+            },
+            _ => {
+                // Default: distance between two points (assuming 2D)
+                param1.hypot(param2)
+            }
+        };
+        
+        Ok(vec![result])
+    }
+    
+    /// Evaluate discrete mathematics operations
+    fn evaluate_discrete_math(&self, input: &[f64]) -> Result<Vec<f64>> {
+        if input.len() < 2 {
+            return Ok(vec![0.0]);
+        }
+        
+        let operation = input[0].round() as i32;
+        let n = input[1].abs() as u64;
+        let r = input.get(2).unwrap_or(&0.0).abs() as u64;
+        
+        let result = match operation {
+            0 => {
+                // Factorial
+                if n <= 20 { // Prevent overflow
+                    self.factorial(n) as f64
+                } else {
+                    0.0
+                }
+            },
+            1 => {
+                // Permutation P(n,r)
+                if r <= n && n <= 20 {
+                    let mut perm = 1u64;
+                    for i in 0..r {
+                        perm *= n - i;
+                    }
+                    perm as f64
+                } else {
+                    0.0
+                }
+            },
+            2 => {
+                // Combination C(n,r)
+                if r <= n && n <= 20 {
+                    let r = r.min(n - r); // Use symmetry
+                    let mut comb = 1u64;
+                    for i in 0..r {
+                        comb = comb * (n - i) / (i + 1);
+                    }
+                    comb as f64
+                } else {
+                    0.0
+                }
+            },
+            3 => {
+                // Catalan number C_n = C(2n,n)/(n+1)
+                if n <= 10 { // Prevent overflow
+                    let two_n = 2 * n;
+                    let mut catalan = 1u64;
+                    for i in 0..n {
+                        catalan = catalan * (two_n - i) / (i + 1);
+                    }
+                    (catalan / (n + 1)) as f64
+                } else {
+                    0.0
+                }
+            },
+            4 => {
+                // Set cardinality (simple union)
+                // Treat as |A ∪ B| = |A| + |B| - |A ∩ B|
+                // Use input parameters as set sizes
+                let set_a_size = n as f64;
+                let set_b_size = r as f64;
+                let intersection_size = input.get(3).unwrap_or(&0.0).abs();
+                set_a_size + set_b_size - intersection_size
+            },
+            5 => {
+                // Graph connectivity (simplified)
+                // Treat as maximum number of edges in complete graph
+                if n > 0 {
+                    (n * (n - 1) / 2) as f64
+                } else {
+                    0.0
+                }
+            },
+            6 => {
+                // Modular arithmetic: a mod m
+                let a = n;
+                let m = r.max(1); // Prevent division by zero
+                (a % m) as f64
+            },
+            _ => {
+                // Default: simple counting operation
+                n as f64
+            }
+        };
+        
+        Ok(vec![result])
+    }
+    
+    // Helper methods for number theory
+    fn gcd(&self, mut a: u64, mut b: u64) -> u64 {
+        while b != 0 {
+            let temp = b;
+            b = a % b;
+            a = temp;
+        }
+        a
+    }
+    
+    fn is_prime(&self, n: u64) -> bool {
+        if n < 2 {
+            return false;
+        }
+        if n == 2 {
+            return true;
+        }
+        if n % 2 == 0 {
+            return false;
+        }
+        
+        let sqrt_n = (n as f64).sqrt() as u64;
+        for i in (3..=sqrt_n).step_by(2) {
+            if n % i == 0 {
+                return false;
+            }
+        }
+        true
+    }
+    
+    fn factorial(&self, n: u64) -> u64 {
+        if n <= 1 {
+            1
+        } else {
+            (1..=n).product()
+        }
+    }
+    
+    fn fibonacci(&self, n: u64) -> u64 {
+        if n <= 1 {
+            n
+        } else {
+            let mut prev = 0;
+            let mut curr = 1;
+            for _ in 2..=n {
+                let next = prev + curr;
+                prev = curr;
+                curr = next;
+            }
+            curr
+        }
     }
     
     /// Get the specialization score for this module type
@@ -753,6 +1144,6 @@ mod tests {
         assert_eq!(ModuleType::Calculus.complexity_level(), 6);
         
         let all_types = ModuleType::all();
-        assert!(all_types.len() >= 10);
+        assert!(all_types.len() >= 11);
     }
 }

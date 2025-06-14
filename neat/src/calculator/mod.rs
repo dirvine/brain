@@ -22,6 +22,10 @@ pub mod arithmetic_modules;
 pub mod algebra_modules;
 pub mod discovery;
 pub mod conjecture;
+pub mod calculus;
+pub mod trigonometry;
+pub mod statistics;
+pub mod discrete_math;
 
 pub use arithmetic::*;
 pub use encoding::*;
@@ -36,6 +40,10 @@ pub use arithmetic_modules::*;
 pub use algebra_modules::*;
 pub use discovery::*;
 pub use conjecture::*;
+pub use calculus::*;
+pub use trigonometry::*;
+pub use statistics::*;
+pub use discrete_math::*;
 
 /// Mathematical operations that can be learned
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
