@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
+// @ts-ignore
 import { DataSet, Network } from 'vis-network/standalone/esm/vis-network';
 
 // Check if we're running in Tauri context
@@ -9,6 +10,7 @@ interface NetworkVisualization {
   nodes: NetworkNode[];
   edges: NetworkEdge[];
   metrics: NetworkMetrics;
+  module_type?: string;
 }
 
 interface NetworkNode {
@@ -51,11 +53,6 @@ interface ProblemResponse {
   network_data: NetworkVisualization;
 }
 
-interface SolutionRequest {
-  problem: string;
-  student_answer: string;
-}
-
 interface SolutionResponse {
   answer: string;
   explanation: string;
@@ -72,12 +69,6 @@ interface EducationalProblemData {
   expected_answer: string;
   difficulty: string;
   topic: string;
-}
-
-interface SolutionRequest {
-  problem_id: string;
-  student_answer: string;
-  student_id?: string;
 }
 
 
@@ -187,7 +178,7 @@ async function generateProblem() {
       topic: selectedTopic,
       difficulty: selectedDifficulty,
       statement: response.problem_text,
-      expected_solution: response.expected_answer,
+      expected_answer: response.expected_answer,
       hint: response.hints[0] || 'No hint available'
     };
     
@@ -255,7 +246,7 @@ async function submitAnswer() {
   }
 
   try {
-    const request: SolutionRequest = {
+    const request = {
       problem: currentProblem.statement,
       student_answer: answer
     };
@@ -357,6 +348,7 @@ function visualizeNetwork(networkViz: NetworkVisualization) {
   })));
 
   const edges = new DataSet(networkViz.edges.map(edge => ({
+    id: `${edge.from}-${edge.to}`,
     from: edge.from,
     to: edge.to,
     width: edge.width || Math.abs(edge.weight) * 3,
@@ -384,7 +376,9 @@ function visualizeNetwork(networkViz: NetworkVisualization) {
     },
     edges: {
       smooth: {
-        type: 'continuous'
+        enabled: true,
+        type: 'continuous',
+        roundness: 0.5
       }
     }
   };
@@ -417,7 +411,7 @@ function updateNetworkInfo(networkViz: NetworkVisualization) {
     const hiddenNodes = networkViz.nodes.filter(n => n.node_type === 'hidden').length;
     
     infoElement.innerHTML = `
-      <strong>Module Type:</strong> ${networkViz.module_type}<br>
+      <strong>Module Type:</strong> ${networkViz.module_type || 'Mathematical Module'}<br>
       <strong>Network Structure:</strong> ${nodeCount} nodes, ${edgeCount} connections<br>
       <strong>Hidden Layers:</strong> ${hiddenNodes} hidden neurons<br>
       <strong>Evolution:</strong> Evolved topology using NEAT algorithm
@@ -604,21 +598,7 @@ declare global {
   }
 }
 
-function renderMath(element: HTMLElement) {
-  if (window.katex && element.textContent) {
-    try {
-      const mathContent = element.textContent;
-      if (mathContent.includes('\\') || mathContent.includes('^') || mathContent.includes('_')) {
-        element.innerHTML = window.katex.renderToString(mathContent, {
-          throwOnError: false,
-          displayMode: false
-        });
-      }
-    } catch (error) {
-      console.warn('Failed to render math:', error);
-    }
-  }
-}
+// Removed unused renderMath function
 
 // Export for potential external use
 export {

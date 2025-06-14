@@ -9,12 +9,14 @@ homepage = "https://github.com/dirvine/brain"
 repository = "https://github.com/dirvine/brain"
 readme = "README.md"
 keywords = ["education", "mathematics", "neural-networks", "neat", "gui"]
-categories = ["education", "gui", "science"]
+categories = ["gui", "science", "algorithms"]
 include = [
     "src/**/*",
     "icons/**/*",
     "gen/**/*",
+    "dist/**/*",
     "tauri.conf.json",
+    "tsconfig.json",
     "index.html",
     "vite.config.ts",
     "package.json",
